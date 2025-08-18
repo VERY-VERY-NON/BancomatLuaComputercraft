@@ -21,9 +21,12 @@ local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(1) -- canale server
 print("Server Bancomat attivo sul canale 1...")
 
-while true do
-    local event, side, channel, replyChannel, message, senderID = os.pullEvent("modem_message")
+local event, side, channel, replyChannel, message, distance
 
+while true do
+    repeat
+          event, side, channel, replyChannel, message, distance = os.pullEvent("modem_message")
+    until channel == 43
     -- Decodifica il messaggio (deve essere una stringa serializzata)
     local ok, msg = pcall(textutils.unserialize, message)
     if not ok or type(msg) ~= "table" then
