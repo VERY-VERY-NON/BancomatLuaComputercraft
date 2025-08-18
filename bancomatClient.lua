@@ -15,10 +15,21 @@ end
 
 -- Funzione per comunicare col server
 local function sendRequest(msg)
-    modem.transmit(1, 2, msg) -- canale server, reply sul client
-    local event, side, senderChannel, replyChannel, response, senderID = os.pullEvent("modem_message")
-    return response
+    modem.transmit(1, 2, msg) -- invia al server
+
+    -- attende messaggio dal server con timeout
+    local timer = os.startTimer(5) -- 5 secondi timeout
+    while true do
+        local event, side, senderChannel, replyChannel, response, senderID = os.pullEvent()
+        if event == "modem_message" and senderChannel == 2 then
+            os.cancelTimer(timer)
+            return response
+        elseif event == "timer" and side == timer then
+            return {success = false, error = "Timeout: server non risponde"}
+        end
+    end
 end
+
 
 -- Login
 print("=== BANCOMAT ===")
