@@ -4,7 +4,6 @@
 local accountFile = "conti.txt"
 local monitor = peripheral.find("monitor") or error("No monitor")
 
-monitor = peripheral.wrap(monitorSide)
 monitor.clear()
 monitor.setCursorPos(1,1)
 
