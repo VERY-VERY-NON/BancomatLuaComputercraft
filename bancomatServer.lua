@@ -85,7 +85,7 @@ while true do
     end
 
     -- Invia sempre la risposta al replyChannel del client
-    modem.transmit(replyChannel, 1, textutils.serialize(response))
+    modem.transmit(replyChannel, 1, response)
 
     ::continue::
 end
