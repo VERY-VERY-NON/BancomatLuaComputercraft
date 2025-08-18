@@ -2,6 +2,8 @@
 local accountFile = "conti.txt"
 local accounts = {}
 
+local modemPort = 1
+
 -- Carica dati
 if fs.exists(accountFile) then
     local file = fs.open(accountFile, "r")
@@ -18,7 +20,7 @@ end
 
 -- Ender Modem
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
-modem.open(1) -- canale server
+modem.open(modemPort) -- canale server
 print("Server Bancomat attivo sul canale 1...")
 
 local event, side, channel, replyChannel, message, distance
@@ -26,7 +28,7 @@ local event, side, channel, replyChannel, message, distance
 while true do
     repeat
           event, side, channel, replyChannel, message, distance = os.pullEvent("modem_message")
-    until channel == 43
+    until channel == modemPort
     -- Decodifica il messaggio (deve essere una stringa serializzata)
     local ok, msg = pcall(textutils.unserialize, message)
     if not ok or type(msg) ~= "table" then
