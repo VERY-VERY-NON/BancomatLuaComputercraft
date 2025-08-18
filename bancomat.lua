@@ -2,15 +2,14 @@
 
 -- Configurazione
 local accountFile = "conti.txt"
-local monitorSide = "left"  -- lato dove c'è il monitor
-local monitor
-if peripheral.isPresent(monitorSide) then
-    monitor = peripheral.wrap(monitorSide)
-    monitor.clear()
-    monitor.setCursorPos(1,1)
-else
-    print("Attenzione: nessun monitor collegato su " .. monitorSide)
-end
+local monitor = peripheral.find("monitor") or error("No monitor")
+
+monitor = peripheral.wrap(monitorSide)
+monitor.clear()
+monitor.setCursorPos(1,1)
+
+local chest = peripheral.find("minecraft:chest") or error("No chest")
+local creditCard
 
 -- Carica dati
 local accounts = {}
@@ -20,6 +19,13 @@ if fs.exists(accountFile) then
     file.close()
 else
     accounts = {}
+end
+
+local function getCreditCard()
+    creditCard = chest.getItemDetail(1)
+    if creditCard then
+        print(creditCard.name)
+    end
 end
 
 -- Salva dati
@@ -59,6 +65,11 @@ end
 
 -- Login
 print("=== BANCOMAT ===")
+write("Inserire card di credito nel primo slot della chest")
+repeat 
+
+until creditCard
+
 write("Nome utente: ")
 local nome = read()
 write("Password: ")
