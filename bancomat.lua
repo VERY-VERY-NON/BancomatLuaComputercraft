@@ -66,6 +66,7 @@ end
 local function aggiornaMonitor(msg)
     monitor.clear()
     monitor.setCursorPos(1,1)
+    monitor.setTextScale(2)
     monitor.write(msg)
 end
 
