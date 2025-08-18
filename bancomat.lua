@@ -1,19 +1,19 @@
--- bancomat_monitor.lua
-local accountFile = "conti.txt"
-local accounts = {}
+-- bancomat_secure.lua
 
--- Configura monitor
-local monitorSide = "left"  -- cambia se il monitor è su un altro lato
+-- Configurazione
+local accountFile = "conti.txt"
+local monitorSide = "left"  -- lato dove c'è il monitor
 local monitor
 if peripheral.isPresent(monitorSide) then
     monitor = peripheral.wrap(monitorSide)
     monitor.clear()
     monitor.setCursorPos(1,1)
 else
-    print("Nessun monitor collegato su " .. monitorSide)
+    print("Attenzione: nessun monitor collegato su " .. monitorSide)
 end
 
 -- Carica dati
+local accounts = {}
 if fs.exists(accountFile) then
     local file = fs.open(accountFile, "r")
     accounts = textutils.unserialize(file.readAll())
@@ -29,21 +29,19 @@ local function salva()
     file.close()
 end
 
--- Ottieni saldo
+-- Funzioni principali
 local function saldo(nome)
-    return accounts[nome] or 0
+    return accounts[nome].saldo or 0
 end
 
--- Deposito
 local function deposita(nome, quanti)
-    accounts[nome] = saldo(nome) + quanti
+    accounts[nome].saldo = saldo(nome) + quanti
     salva()
 end
 
--- Prelievo
 local function preleva(nome, quanti)
     if saldo(nome) >= quanti then
-        accounts[nome] = saldo(nome) - quanti
+        accounts[nome].saldo = saldo(nome) - quanti
         salva()
         return true
     else
@@ -51,21 +49,35 @@ local function preleva(nome, quanti)
     end
 end
 
--- Aggiorna monitor
-local function aggiornaMonitor()
+local function aggiornaMonitor(msg)
     if monitor then
         monitor.clear()
         monitor.setCursorPos(1,1)
-        monitor.write("Saldo: " .. saldo(nome) .. " crediti")
+        monitor.write(msg or ("Saldo: " .. saldo(nome) .. " crediti"))
     end
 end
 
--- Programma principale
+-- Login
 print("=== BANCOMAT ===")
-write("Inserisci nome: ")
+write("Nome utente: ")
 local nome = read()
-aggiornaMonitor()
+write("Password: ")
+local password = read("*")  -- nasconde input
 
+if accounts[nome] then
+    if accounts[nome].password ~= password then
+        print("Password errata!")
+        return
+    end
+else
+    -- Se non esiste l'utente, lo crea
+    accounts[nome] = {saldo=0, password=password}
+    salva()
+end
+
+aggiornaMonitor("Benvenuto " .. nome .. "\nSaldo: " .. saldo(nome))
+
+-- Loop principale
 while true do
     print("\n1) Saldo\n2) Deposito\n3) Prelievo\n4) Esci")
     write("Scelta: ")
@@ -73,22 +85,31 @@ while true do
 
     if scelta == "1" then
         print("Saldo di " .. nome .. ": " .. saldo(nome) .. " crediti")
-        aggiornaMonitor()
+        aggiornaMonitor("Saldo: " .. saldo(nome) .. " crediti")
     elseif scelta == "2" then
-        write("Quanti crediti depositi? ")
+        write("Quantità da depositare: ")
         local q = tonumber(read())
-        deposita(nome, q)
-        print("Deposito effettuato!")
-        aggiornaMonitor()
-    elseif scelta == "3" then
-        write("Quanti crediti prelevi? ")
-        local q = tonumber(read())
-        if preleva(nome, q) then
-            print("Prelievo effettuato!")
+        if q and q > 0 then
+            deposita(nome, q)
+            print("Deposito effettuato!")
+            aggiornaMonitor("Deposito: +" .. q .. "\nSaldo: " .. saldo(nome))
         else
-            print("Saldo insufficiente.")
+            print("Importo non valido")
         end
-        aggiornaMonitor()
+    elseif scelta == "3" then
+        write("Quantità da prelevare: ")
+        local q = tonumber(read())
+        if q and q > 0 then
+            if preleva(nome, q) then
+                print("Prelievo effettuato!")
+                aggiornaMonitor("Prelievo: -" .. q .. "\nSaldo: " .. saldo(nome))
+            else
+                print("Saldo insufficiente.")
+                aggiornaMonitor("Saldo insufficiente\nSaldo: " .. saldo(nome))
+            end
+        else
+            print("Importo non valido")
+        end
     elseif scelta == "4" then
         break
     else
