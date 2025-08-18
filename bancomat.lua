@@ -23,7 +23,7 @@ end
 local function getCreditCard()
     creditCard = chest.getItemDetail(1)
     if creditCard then
-        print(creditCard.name)
+        print(creditCard.displayName)
     end
 end
 
@@ -70,19 +70,17 @@ repeat
     sleep(0.5)
 until creditCard
 
-write("Nome utente: ")
-local nome = read()
-write("Password: ")
-local password = read("*")  -- nasconde input
+write("Pin: ")
+local pin = read("*")  -- nasconde input
 
-if accounts[nome] then
-    if accounts[nome].password ~= password then
-        print("Password errata!")
+if accounts[creditCard] then
+    if accounts[creditCard].pin ~= pin then
+        print("Pin errato!")
         return
     end
 else
     -- Se non esiste l'utente, lo crea
-    accounts[nome] = {saldo=0, password=password}
+    accounts[creditCard] = {saldo=0, pin=pin}
     salva()
 end
 
