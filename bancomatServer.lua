@@ -19,17 +19,23 @@ end
 -- Ender Modem
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(1) -- canale server
-
-print("Server Bancomat attivo...")
+print("Server Bancomat attivo sul canale 1...")
 
 while true do
-    local event, side, senderChannel, replyChannel, message, senderID = os.pullEvent("modem_message")
+    local event, side, channel, replyChannel, message, senderID = os.pullEvent("modem_message")
+
+    -- Decodifica il messaggio (deve essere una stringa serializzata)
+    local ok, msg = pcall(textutils.unserialize, message)
+    if not ok or type(msg) ~= "table" then
+        modem.transmit(replyChannel, 1, textutils.serialize({success = false, error="Messaggio non valido"}))
+        goto continue
+    end
 
     local response = {}
 
-    if message.cmd == "login" then
-        local cardKey = message.cardKey
-        local pin = message.pin
+    if msg.cmd == "login" then
+        local cardKey = msg.cardKey
+        local pin = msg.pin
 
         if accounts[cardKey] then
             if accounts[cardKey].pin == pin then
@@ -46,21 +52,22 @@ while true do
             response.saldo = 0
         end
 
-    elseif message.cmd == "saldo" then
-        local cardKey = message.cardKey
+    elseif msg.cmd == "saldo" then
+        local cardKey = msg.cardKey
+        response.success = true
         response.saldo = accounts[cardKey] and accounts[cardKey].saldo or 0
 
-    elseif message.cmd == "deposita" then
-        local cardKey = message.cardKey
-        local quanti = message.amount
+    elseif msg.cmd == "deposita" then
+        local cardKey = msg.cardKey
+        local quanti = msg.amount or 0
         accounts[cardKey].saldo = (accounts[cardKey].saldo or 0) + quanti
         salva()
         response.success = true
         response.saldo = accounts[cardKey].saldo
 
-    elseif message.cmd == "preleva" then
-        local cardKey = message.cardKey
-        local quanti = message.amount
+    elseif msg.cmd == "preleva" then
+        local cardKey = msg.cardKey
+        local quanti = msg.amount or 0
         if (accounts[cardKey].saldo or 0) >= quanti then
             accounts[cardKey].saldo = accounts[cardKey].saldo - quanti
             salva()
@@ -71,7 +78,13 @@ while true do
             response.error = "Saldo insufficiente"
             response.saldo = accounts[cardKey].saldo
         end
+    else
+        response.success = false
+        response.error = "Comando sconosciuto"
     end
 
-    modem.transmit(senderChannel, 1, response)
+    -- Invia sempre la risposta al replyChannel del client
+    modem.transmit(replyChannel, 1, textutils.serialize(response))
+
+    ::continue::
 end
