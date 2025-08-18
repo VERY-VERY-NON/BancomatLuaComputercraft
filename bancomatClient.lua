@@ -45,9 +45,11 @@ local pin = read("*")
 
 local loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
 if not loginResponse.success then
-    print("Errore: " .. loginResponse.error)
-    return
+    print("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
+else
+    print("Login effettuato! Saldo: " .. loginResponse.saldo)
 end
+
 
 monitor.clear()
 monitor.setCursorPos(1,1)
