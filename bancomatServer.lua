@@ -29,15 +29,11 @@ while true do
     repeat
           event, side, channel, replyChannel, message, distance = os.pullEvent("modem_message")
     until channel == modemPort
-    -- Decodifica il messaggio (deve essere una stringa serializzata)
-    local ok, msg = pcall(textutils.unserialize, message)
-    if not ok or type(msg) ~= "table" then
-        modem.transmit(replyChannel, 1, textutils.serialize({success = false, error="Messaggio non valido"}))
-        goto continue
-    end
-
+    -- Decodifica il messaggio (deve essere una stringa serializzata)    
     local response = {}
 
+    local msg = message
+    
     if msg.cmd == "login" then
         local cardKey = msg.cardKey
         local pin = msg.pin
