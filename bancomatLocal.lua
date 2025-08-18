@@ -1,6 +1,6 @@
 local monitor = peripheral.find("monitor") or error("Nessun monitor")
 local chest = peripheral.find("minecraft:chest") or error("Nessuna chest")
-local modem = peripheral.find("ender_modem") or error("Nessun Ender Modem")
+local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(2) -- canale client
 
 -- Funzione carta
