@@ -17,7 +17,7 @@ local function salva()
 end
 
 -- Ender Modem
-local modem = peripheral.find("ender_modem") or error("Nessun Ender Modem")
+local modem = peripheral.find(modem) or error("Nessun Ender Modem")
 modem.open(1) -- canale server
 
 print("Server Bancomat attivo...")
