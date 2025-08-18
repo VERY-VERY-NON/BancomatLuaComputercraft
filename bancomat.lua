@@ -66,7 +66,8 @@ end
 print("=== BANCOMAT ===")
 write("Inserire card di credito nel primo slot della chest")
 repeat 
-
+    getCreditCard()
+    sleep(0.5)
 until creditCard
 
 write("Nome utente: ")
