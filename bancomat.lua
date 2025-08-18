@@ -2,13 +2,11 @@
 
 -- Configurazione
 local accountFile = "conti.txt"
-local monitor = peripheral.find("monitor") or error("No monitor")
+local monitor = peripheral.find("monitor") or error("Nessun monitor trovato")
+local chest = peripheral.find("minecraft:chest") or error("Nessuna chest trovata")
 
 monitor.clear()
 monitor.setCursorPos(1,1)
-
-local chest = peripheral.find("minecraft:chest") or error("No chest")
-local creditCard
 
 -- Carica dati
 local accounts = {}
@@ -16,15 +14,6 @@ if fs.exists(accountFile) then
     local file = fs.open(accountFile, "r")
     accounts = textutils.unserialize(file.readAll())
     file.close()
-else
-    accounts = {}
-end
-
-local function getCreditCard()
-    creditCard = chest.getItemDetail(1)
-    if creditCard then
-        print(creditCard.displayName)
-    end
 end
 
 -- Salva dati
@@ -34,19 +23,39 @@ local function salva()
     file.close()
 end
 
--- Funzioni principali
-local function saldo(creditCard)
-    return accounts[creditCard].saldo or 0
+-- Ottieni carta di credito valida
+local function getCreditCard()
+    local card = chest.getItemDetail(1)
+    if not card then return nil end
+
+    if card.name ~= "minecraft:paper" then
+        print("L'oggetto non è una carta valida (serve carta di credito = carta)")
+        return nil
+    end
+
+    if card.count ~= 1 then
+        print("Inserisci UNA sola carta per volta")
+        return nil
+    end
+
+    -- Identificativo univoco della carta
+    local key = card.name .. ":" .. (card.nbt or "default")
+    return key, card.displayName
 end
 
-local function deposita(creditCard, quanti)
-    accounts[creditCard].saldo = saldo(creditCard) + quanti
+-- Funzioni principali
+local function saldo(cardKey)
+    return accounts[cardKey] and accounts[cardKey].saldo or 0
+end
+
+local function deposita(cardKey, quanti)
+    accounts[cardKey].saldo = saldo(cardKey) + quanti
     salva()
 end
 
-local function preleva(creditCard, quanti)
-    if saldo(creditCard) >= quanti then
-        accounts[creditCard].saldo = saldo(creditCard) - quanti
+local function preleva(cardKey, quanti)
+    if saldo(cardKey) >= quanti then
+        accounts[cardKey].saldo = saldo(cardKey) - quanti
         salva()
         return true
     else
@@ -55,36 +64,36 @@ local function preleva(creditCard, quanti)
 end
 
 local function aggiornaMonitor(msg)
-    if monitor then
-        monitor.clear()
-        monitor.setCursorPos(1,1)
-        monitor.write(msg or ("Saldo: " .. saldo(nome) .. " crediti"))
-    end
+    monitor.clear()
+    monitor.setCursorPos(1,1)
+    monitor.write(msg)
 end
 
 -- Login
 print("=== BANCOMAT ===")
-write("Inserire card di credito nel primo slot della chest")
-repeat 
-    getCreditCard()
+print("Inserire carta di credito nel primo slot della chest...")
+
+local cardKey, cardName
+repeat
+    cardKey, cardName = getCreditCard()
     sleep(0.5)
-until creditCard
+until cardKey
 
 write("Pin: ")
-local pin = read("*")  -- nasconde input
+local pin = read("*") -- input nascosto
 
-if accounts[creditCard] then
-    if accounts[creditCard].pin ~= pin then
+if accounts[cardKey] then
+    if accounts[cardKey].pin ~= pin then
         print("Pin errato!")
         return
     end
 else
-    -- Se non esiste l'utente, lo crea
-    accounts[creditCard] = {saldo=0, pin=pin}
+    -- Primo utilizzo: crea nuovo account
+    accounts[cardKey] = {saldo = 0, pin = pin}
     salva()
 end
 
-aggiornaMonitor("Benvenuto " .. nome .. "\nSaldo: " .. saldo(nome))
+aggiornaMonitor("Benvenuto!\nCarta: " .. cardName .. "\nSaldo: " .. saldo(cardKey))
 
 -- Loop principale
 while true do
@@ -93,15 +102,15 @@ while true do
     local scelta = read()
 
     if scelta == "1" then
-        print("Saldo di " .. nome .. ": " .. saldo(nome) .. " crediti")
-        aggiornaMonitor("Saldo: " .. saldo(nome) .. " crediti")
+        print("Saldo attuale: " .. saldo(cardKey) .. " crediti")
+        aggiornaMonitor("Saldo: " .. saldo(cardKey))
     elseif scelta == "2" then
         write("Quantità da depositare: ")
         local q = tonumber(read())
         if q and q > 0 then
-            deposita(nome, q)
+            deposita(cardKey, q)
             print("Deposito effettuato!")
-            aggiornaMonitor("Deposito: +" .. q .. "\nSaldo: " .. saldo(nome))
+            aggiornaMonitor("Deposito +" .. q .. "\nSaldo: " .. saldo(cardKey))
         else
             print("Importo non valido")
         end
@@ -109,12 +118,12 @@ while true do
         write("Quantità da prelevare: ")
         local q = tonumber(read())
         if q and q > 0 then
-            if preleva(nome, q) then
+            if preleva(cardKey, q) then
                 print("Prelievo effettuato!")
-                aggiornaMonitor("Prelievo: -" .. q .. "\nSaldo: " .. saldo(nome))
+                aggiornaMonitor("Prelievo -" .. q .. "\nSaldo: " .. saldo(cardKey))
             else
                 print("Saldo insufficiente.")
-                aggiornaMonitor("Saldo insufficiente\nSaldo: " .. saldo(nome))
+                aggiornaMonitor("Saldo insufficiente\nSaldo: " .. saldo(cardKey))
             end
         else
             print("Importo non valido")
@@ -127,8 +136,6 @@ while true do
 end
 
 print("Arrivederci!")
-if monitor then
-    monitor.clear()
-    monitor.setCursorPos(1,1)
-    monitor.write("Grazie!")
-end
+monitor.clear()
+monitor.setCursorPos(1,1)
+monitor.write("Grazie per aver usato il Bancomat!")
