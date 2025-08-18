@@ -35,18 +35,18 @@ local function salva()
 end
 
 -- Funzioni principali
-local function saldo(nome)
-    return accounts[nome].saldo or 0
+local function saldo(creditCard)
+    return accounts[creditCard].saldo or 0
 end
 
-local function deposita(nome, quanti)
-    accounts[nome].saldo = saldo(nome) + quanti
+local function deposita(creditCard, quanti)
+    accounts[creditCard].saldo = saldo(creditCard) + quanti
     salva()
 end
 
-local function preleva(nome, quanti)
-    if saldo(nome) >= quanti then
-        accounts[nome].saldo = saldo(nome) - quanti
+local function preleva(creditCard, quanti)
+    if saldo(creditCard) >= quanti then
+        accounts[creditCard].saldo = saldo(creditCard) - quanti
         salva()
         return true
     else
