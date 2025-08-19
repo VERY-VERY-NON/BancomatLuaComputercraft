@@ -119,7 +119,6 @@ while true do
                 salvaMoney()
                 response.success = true
                 response.saldo = accounts[cardKey].saldo
-        end
         else
             response.success = false
             response.error = "Tentativo truffaldino! Se credi sia un errore, fai uno screen e contattalo alle autorità"
