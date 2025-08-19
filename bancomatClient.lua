@@ -5,7 +5,7 @@ local barrel = peripheral.find("minecraft:barrel") or error("Nessun barrel")
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(2) -- canale client
 
--- Funzione carta
+-- Funzione carta asd
 local function getCreditCard()
     local card = chest.getItemDetail(1)
     if not card then return nil end
