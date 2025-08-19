@@ -8,41 +8,41 @@ modem.open(2) -- canale client
 -- Funzione carta asd
 local function getCreditCard()
     local card = chest.getItemDetail(1)
-    if not card then return nil end
-    if card.name ~= "minecraft:paper"then
+    if not card then 
         redstone.setAnalogOutput("bottom", 0)
-        return nil
+        return nil 
     end
-    if card.count ~= 1 then
-        redstone.setAnalogOutput("bottom", 0)
-        return nil
-    end
-    if card.nbt == nil then
+    if card.name ~= "minecraft:paper" or card.count ~= 1 or card.nbt == nil then
         redstone.setAnalogOutput("bottom", 0)
         return nil
     end
     
     local key = card.nbt
-    return key, card.displayName
+    local name = card.displayName
+
+    -- qui non serve controllare se è numero, può essere qualsiasi stringa
+    return key, name
 end
 
 local function getPin()
     local card = chest.getItemDetail(1)
-    if not card then return nil end
-    if card.name ~= "minecraft:paper" then
+    if not card then 
         redstone.setAnalogOutput("bottom", 0)
-        return nil
+        return nil 
     end
-    if card.count ~= 1 then
-        redstone.setAnalogOutput("bottom", 0)
-        return nil
-    end
-    if card.nbt == nil then
+    if card.name ~= "minecraft:paper" or card.count ~= 1 or card.nbt == nil then
         redstone.setAnalogOutput("bottom", 0)
         return nil
     end
     
-    return card.displayName
+    -- Controllo che displayName sia solo un numero
+    local pin = card.displayName
+    if tonumber(pin) == nil then
+        redstone.setAnalogOutput("bottom", 0)
+        return nil
+    end
+
+    return pin
 end
 
 local function getPrintedMoney()
