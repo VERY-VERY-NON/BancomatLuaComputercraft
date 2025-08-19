@@ -110,8 +110,12 @@ local function getPin(accountEsiste)
             pin = pin .. tasto
             hiddenPin = hiddenPin .. "*"
         elseif tasto == "del" then
-            pin = pin:sub(1, -2)
-            hiddenPin = pin:sub(1, -2)
+            if #pin > 1 then
+                pin = pin:sub(1, -2)
+            end
+            if #hiddenPin > 1 then
+                hiddenPin = pin:sub(1, -2)
+            end
         end
 
         monitor.setCursorPos(12, 8)
