@@ -80,10 +80,9 @@ while true do
     elseif msg.cmd == "deposita" then
         local cardKey = msg.cardKey
         local moneyKey = msg.moneyKey
-        local quanti = msg.amount or 0
 
-        if money[moneyKey] and money[moneyKey].quanti == quanti then
-            accounts[cardKey].saldo = (accounts[cardKey].saldo or 0) + quanti
+        if money[moneyKey] then
+            accounts[cardKey].saldo = (accounts[cardKey].saldo or 0) + money[moneyKey].quanti
             money[moneyKey] = nil
             salva()
             response.success = true
