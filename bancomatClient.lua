@@ -86,7 +86,7 @@ local function getNumPadPress(_x, _y)
     elseif row == 5 then
         if col == 1 then
             return "ok"
-        elseif col == 3 then
+        elseif col == 3 or col == 4 then
             return "del"
         else
             return nil
@@ -233,7 +233,7 @@ repeat
         sleep(0.5)
     until pin
         
-    local loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
+    loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
     
     if not loginResponse.success then
         monitor.clear()
@@ -267,8 +267,8 @@ else
     
         scelta = math.ceil(y / 2)
         scelta = math.max(1, math.min(4, scelta)) 
-        print(scelta)
-        if scelta == "1" then
+        
+        if scelta == 1 then
             local resp = sendRequest({cmd="saldo", cardKey=cardKey})
             print("Saldo: " .. resp.saldo)
             monitor.clear()
@@ -276,7 +276,7 @@ else
             monitor.write("Saldo: " .. resp.saldo)
             tornareIndietroFunzione(7)
     
-        elseif scelta == "2" then
+        elseif scelta == 2 then
             write("Inserire i soldi da depositare nel primo slot del barile")
             repeat
                 moneyKey = getPrintedMoney()
@@ -297,7 +297,7 @@ else
                 monitor.write("Errore" .. resp.error)
                 tornareIndietroFunzione(7)
             end
-        elseif scelta == "3" then
+        elseif scelta == 3 then
             write("Quantità da prelevare: ")
             local q = tonumber(read())
             if q and q > 0 then
@@ -361,7 +361,7 @@ else
                 monitor.write("Saldo: " .. resp.saldo)
             end
     
-        elseif scelta == "4" then
+        elseif scelta == 4 then
             break
         else
             monitor.clear()
