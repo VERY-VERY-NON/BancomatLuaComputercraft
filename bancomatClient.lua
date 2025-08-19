@@ -130,7 +130,7 @@ while true do
                     moneyKey = getPrintedMoney()
                     sleep(0.5)
                 until moneyKey
-                local resp = sendRequest({cmd="preleva", moneyKey=moneyKey, amount=q})
+                local resp = sendRequest({cmd="preleva",cardKey=cardKey, moneyKey=moneyKey, amount=q})
 
                 if resp.success then
                     print("Money registrati con sucesso")
