@@ -4,6 +4,7 @@ local accounts = {}
 
 local moneyFile = "money.txt"
 local money = {}
+local moneyCurId = 0
 
 local modemPort = 1
 
@@ -78,11 +79,21 @@ while true do
 
     elseif msg.cmd == "deposita" then
         local cardKey = msg.cardKey
+        local moneyKey = msg.moneyKey
         local quanti = msg.amount or 0
-        accounts[cardKey].saldo = (accounts[cardKey].saldo or 0) + quanti
-        salva()
-        response.success = true
-        response.saldo = accounts[cardKey].saldo
+
+        if money[moneyKey] and money[moneyKey].quanti == quanti then
+            accounts[cardKey].saldo = (accounts[cardKey].saldo or 0) + quanti
+            money[moneyKey] = nil
+            moneyCurId = moneyCurId - 1
+            salva()
+            response.success = true
+            response.saldo = accounts[cardKey].saldo
+        else
+            response.success = false
+            response.error = "Moneta non riconosciuta"
+            response.saldo = accounts[cardKey].saldo
+        end
 
     elseif msg.cmd == "preleva" then
         local cardKey = msg.cardKey
@@ -93,6 +104,8 @@ while true do
             salva()
             response.success = true
             response.saldo = accounts[cardKey].saldo
+            response.moneyCurId = moneyCurId
+            moneyCurId = moneyCurId + 1
         end
     elseif msg.cmd == "registra soldi" then
         local moneyKey = msg.moneyKey
@@ -100,7 +113,7 @@ while true do
         local quanti = msg.amount or 0
 
         if (accounts[cardKey].pendingMoney or 0) >= quanti then  
-                money[moneyKey].quanti = accounts[cardKey].pendingMoney
+                money[moneyKey] = {quanti = accounts[cardKey].pendingMoney}
                 accounts[cardKey].pendingMoney = 0
                 salva()
                 salvaMoney()
