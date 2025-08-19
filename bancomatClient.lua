@@ -135,17 +135,36 @@ else
     print("Login effettuato! Saldo: " .. loginResponse.saldo)
 end
 
+local offset = 1
+local add = 2
 
 monitor.clear()
-monitor.setCursorPos(1,1)
-monitor.write("Benvenuto!\nSaldo: " .. loginResponse.saldo)
+monitor.setCursorPos(1,offset)
+offset = offset + add
+monitor.write("1) Saldo attuale")
+monitor.setCursorPos(1,offset)
+offset = offset + add
+monitor.write("2) Deposito")
+monitor.setCursorPos(1,offset)
+offset = offset + add
+monitor.write("3) Prelievo")
+monitor.setCursorPos(1,offset)
+offset = offset + add
+monitor.write("4) Esci")
 
 -- Loop principale
 while true do
-    print("\n1) Saldo\n2) Deposito\n3) Prelievo\n4) Esci")
-    write("Scelta: ")
-    local scelta = read()
+    
+    local scelta
+     local event, side, x, y
+    repeat 
+        event, side, x, y = os.pullEvent("monitor_touch")
+        sleep(0.2)
+    until y
 
+    scelta = math.ceil(y / 2)
+    scelta = math.max(1, math.min(4, scelta)) 
+    
     if scelta == "1" then
         local resp = sendRequest({cmd="saldo", cardKey=cardKey})
         print("Saldo: " .. resp.saldo)
