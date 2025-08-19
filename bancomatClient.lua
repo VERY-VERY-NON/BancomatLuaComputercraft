@@ -1,4 +1,5 @@
 local monitor = peripheral.find("monitor") or error("Nessun monitor")
+local printer = peripheral.find("printer") or error("Nessun printer")
 local chest = peripheral.find("minecraft:chest") or error("Nessuna chest")
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(2) -- canale client
@@ -86,6 +87,22 @@ while true do
             local resp = sendRequest({cmd="preleva", cardKey=cardKey, amount=q})
             if resp.success then
                 print("Prelievo effettuato! Saldo: " .. resp.saldo)
+                -- Start a new page, or print an error.
+                if not printer.newPage() then
+                  error("Cannot start a new page. Do you have ink and paper?")
+                end
+                
+                -- Write to the page
+                printer.setPageTitle("CreditiSociali")
+                printer.write("<<Ricevuta Crediti Sociali>>")
+                printer.setCursorPos(1, 3)
+                printer.write("Prelievo: ")
+                printer.write(q)
+                
+                -- And finally print the page!
+                if not printer.endPage() then
+                  error("Cannot end the page. Is there enough space?")
+                end
             else
                 print("Errore: " .. resp.error)
             end
