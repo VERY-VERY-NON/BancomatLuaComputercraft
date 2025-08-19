@@ -96,6 +96,7 @@ while true do
         end
     elseif msg.cmd == "registra soldi" then
         local moneyKey = msg.moneyKey
+        local cardKey = msg.cardKey
         local quanti = msg.amount or 0
 
         if (accounts[cardKey].pendingMoney or 0) >= quanti then  
@@ -105,6 +106,7 @@ while true do
                 salvaMoney()
                 response.success = true
                 response.saldo = accounts[cardKey].saldo
+        end
         else
             response.success = false
             response.error = "Tentativo truffaldino! Se credi sia un errore, fai uno screen e contattalo alle autorità"
