@@ -364,7 +364,9 @@ else
                     if not printer.endPage() then
                         monitor.clear()
                         monitor.setCursorPos(1,1)
-                        monitor.write("Impossibile stampare la banconota. Contattare le autorità per aiuto")
+                        monitor.write("Impossibile stampare la banconota")
+                        monitor.setCursorPos(1,3)
+                        monitor.write("Contattare le autorità per aiuto")
                         tornareIndietroFunzione(7)
                         return nil
                     end
@@ -389,18 +391,17 @@ else
                     else
                         monitor.clear()
                         monitor.setCursorPos(1,1)
-                        monitor.write("Banconota non registrata. Contattare le autorità per aiuto!")
+                        monitor.write("Banconota non registrata")
+                        monitor.setCursorPos(1,3)
+                        monitor.write("Contattare le autorità per aiuto")
                         tornareIndietroFunzione(7)
                     end
                 else
                     monitor.clear()
                     monitor.setCursorPos(1,1)
-                    monitor.write("Errore: " .. resp.error)
+                    monitor.write(resp.error)
                     tornareIndietroFunzione(7)
                 end
-                monitor.clear()
-                monitor.setCursorPos(1,1)
-                monitor.write("Saldo: " .. resp.saldo)
             end
     
         elseif scelta == 4 then
