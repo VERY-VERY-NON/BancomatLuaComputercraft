@@ -309,25 +309,39 @@ else
             tornareIndietroFunzione(7)
     
         elseif scelta == 2 then
-            write("Inserire i soldi da depositare nel primo slot del barile")
+            monitor.clear()
+            monitor.setCursorPos(1,1)
+            monitor.write("Inserire i soldi da depositare")
+            monitor.setCursorPos(1,3)
+            monitor.write(" nel primo slot del barile.")
+            monitor.setCurosrPos(1,5)
+            monitor.write("Premere sullo schermo ")
+            monitor.setCurosrPos(1,7)
+            monitor.write("per andare indietro")
+            local event, side, x, y
             repeat
+                event, side, x, y = os.pullEvent("monitor_touch")
                 moneyKey = getPrintedMoney()
                 sleep(0.5)
-            until moneyKey
-            
-            local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
-            if resp.success then
-                monitor.clear()
-                monitor.setCursorPos(1,2)
-                monitor.write("Saldo: " .. resp.saldo)
-                tornareIndietroFunzione(7)
+            until moneyKey or x
+
+            if moneyKey then
+                local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
+                if resp.success then
+                    monitor.clear()
+                    monitor.setCursorPos(1,2)
+                    monitor.write("Saldo: " .. resp.saldo)
+                    tornareIndietroFunzione(7)
+                else
+                    monitor.clear()
+                    monitor.setCursorPos(1,2)
+                    monitor.write("Banconota non valida")
+                    monitor.setCursorPos(1,3)
+                    monitor.write("Errore" .. resp.error)
+                    tornareIndietroFunzione(7)
+                end
             else
                 monitor.clear()
-                monitor.setCursorPos(1,2)
-                monitor.write("Banconota non valida")
-                monitor.setCursorPos(1,3)
-                monitor.write("Errore" .. resp.error)
-                tornareIndietroFunzione(7)
             end
         elseif scelta == 3 then
             write("Quantità da prelevare: ")
