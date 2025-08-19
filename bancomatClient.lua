@@ -261,7 +261,7 @@ repeat
     local pin
     
     repeat
-        pin = getPrelievo(accountEsiste)
+        pin = getPin(accountEsiste)
         sleep(0.5)
     until pin
         
@@ -334,7 +334,7 @@ else
             local q 
             
             repeat
-                q = getPin(accountEsiste)
+                q = getPrelievo()
                 sleep(0.5)
             until q
             
