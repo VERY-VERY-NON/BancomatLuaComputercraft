@@ -37,10 +37,10 @@ local function numPad(_x, _y,accountEsiste)
                 monitor.setCursorPos(2 * _x, y * _y)
                 monitor.write("0")
 
-                monitor.setCursorPos(1 * _x, y * _y)
+                monitor.setCursorPos(1 * _x, (y + 1) * _y)
                 monitor.write("ok")
 
-                monitor.setCursorPos(3 * _x, y * _y)
+                monitor.setCursorPos(3 * _x,(y + 1) * _y)
                 monitor.write("del")
 
                 monitor.setCursorPos(6 * _x, 1)
@@ -104,17 +104,17 @@ local function getPin(accountEsiste)
     local offset = 2
     numPad(offset,offset,accountEsiste)
     repeat
-        local tasto = getNumPadPress(offset, offset)
+        tasto = getNumPadPress(offset, offset)
         print(tasto)
         if tonumber(tasto) then
             pin = pin .. tasto
             hiddenPin = hiddenPin .. "*"
         elseif tasto == "del" then
-            if #pin > 1 then
+            if #pin > 0 then
                 pin = pin:sub(1, -2)
             end
-            if #hiddenPin > 1 then
-                hiddenPin = pin:sub(1, -2)
+            if #hiddenPin > 0 then
+                hiddenPin = hiddenPin:sub(1, -2)
             end
         end
 
@@ -122,7 +122,7 @@ local function getPin(accountEsiste)
         monitor.clearLine()
         monitor.write(hiddenPin)
         
-    until tasto == "ok" or #pin == 8
+    until (tasto == "ok" and #pin > 3) or #pin == 8
 
     return pin
 end
