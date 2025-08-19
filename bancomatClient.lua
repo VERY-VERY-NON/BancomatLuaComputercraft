@@ -26,7 +26,7 @@ local function getCreditCard()
     return key, name
 end
 
-local function numPad(_x, _y)
+local function numPad(_x, _y,accountEsiste)
     monitor.clear()
     local curN = 1
 
@@ -36,11 +36,18 @@ local function numPad(_x, _y)
                 monitor.setCursorPos(2 * _x, y * _y)
                 monitor.write("0")
 
-                monitor.setCursorPos(1 * _x, y +1 * y)
-                monitor.write("confirm")
+                monitor.setCursorPos(1 * _x, (y + 1) * y)
+                monitor.write("ok")
 
-                monitor.setCursorPos(3 * _x, y +1 * y)
+                monitor.setCursorPos(3 * _x, (y +1) * y)
                 monitor.write("del")
+
+                monitor.setCursorPos(6 * _x, y * y)
+                if accountEsiste then
+                    monitor.write("Inserire pin della carta")
+                else
+                    monitor.write("Impostare il pin della nuova carta")
+                end
                 break
             end
             monitor.setCursorPos(x * _x, y * _y)
@@ -60,26 +67,47 @@ local function getNumPadPress(_x, _y)
     local col = math.ceil(touchX / _x)
     local row = math.ceil(touchY / _y)
 
-    -- gestisci il tasto premuto
-    if row == 4 then
-        if col == 2 then
-            return "0"
-        elseif col == 1 then
-            return "confirm"
+    -- verifica tasti validi
+    if row >= 1 and row <= 4 and col >= 1 and col <= 3 then
+        if row == 4 then
+            if col == 2 then
+                return "0"
+            else
+                return nil -- colonna invalida nella riga 4
+            end
+        else
+            return tostring((row - 1) * 3 + col) -- numeri 1-9
+        end
+    elseif row == 5 then
+        if col == 1 then
+            return "ok"
         elseif col == 3 then
             return "del"
+        else
+            return nil
         end
     else
-        return (row - 1) * 3 + col  -- converte riga/colonna in numero 1-9
+        return nil -- fuori dal range
     end
 end
 
-local function getPin()
-    local pin
+
+local function getPin(accountEsiste)
+    local tasto
+    local pin = ""
     local offset = 2
-    numPad(offset,offset)
-    local tasto = getNumPadPress(offset, offset)
-    print(tasto)
+    numPad(offset,offset,accountEsiste)
+    repeat
+        local tasto = getNumPadPress(offset, offset)
+        print(tasto)
+        if tonumber(tasto) then
+            pin = pin .. tasto
+        else if tasto == "del" then
+            pin = pin:sub(1, -2)
+        end
+    until tasto == "ok" or #pin == 8
+
+    return pin
 end
 
 local function getPrintedMoney()
@@ -162,31 +190,32 @@ until cardKey
 
 redstone.setAnalogOutput("bottom", 0)
 sleep(0.3)
-
+    
+redstone.setAnalogOutput("back", 15)
+redstone.setAnalogOutput("bottom", 15)
+    
 monitor.clear()
 monitor.setCursorPos(1,1)
 monitor.write("=== BANCOMAT ===")
-monitor.setCursorPos(1,3)
-monitor.write("Inserire il pin scritto su della carta")
-monitor.setCursorPos(1,5)
-monitor.write("nel dispenser e premere il pulsante...")
 
-
-local pin
+local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
+local accountEsiste
     
-repeat
-    pin = getPin()
-    redstone.setAnalogOutput("bottom", 15)
-    sleep(1)
-until pin
-
-redstone.setAnalogOutput("bottom", 0)
-sleep(0.3)
-redstone.setAnalogOutput("back", 15)
-redstone.setAnalogOutput("bottom", 15)
-
+if loginResponse.success == true then
+    accountEsiste = true
+else
+    accountEsiste = false
+end
+    
 local attempt = 1
 repeat 
+    local pin
+    
+    repeat
+        pin = getPin(accountEsiste)
+        sleep(0.5)
+    until pin
+        
     local loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
     
     if not loginResponse.success then
@@ -200,9 +229,9 @@ repeat
 until loginResponse.success or attempt == 4
 
 if attempt == 4 then
-     monitor.clear()
+    monitor.clear()
     monitor.setCursorPos(1,1)
-    monitor.write("Troppi tentativi effettuati"))
+    monitor.write("Troppi tentativi effettuati")
 end
 print("Login effettuato! Saldo: " .. loginResponse.saldo)
 
