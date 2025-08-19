@@ -287,7 +287,7 @@ else
 
     -- Loop principale
     while true do
-    
+
         scriviSceltaMonitor()
         
         local scelta
@@ -317,12 +317,12 @@ else
             
             local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
             if resp.success then
-                print("Deposito effettuato! Saldo: " .. resp.saldo)
                 monitor.clear()
                 monitor.setCursorPos(1,2)
                 monitor.write("Saldo: " .. resp.saldo)
                 tornareIndietroFunzione(7)
             else
+                monitor.clear()
                 monitor.setCursorPos(1,2)
                 monitor.write("Banconota non valida")
                 monitor.setCursorPos(1,3)
@@ -371,7 +371,7 @@ else
     
                     
                     local moneyKey
-                    write("Inserire i soldi stampati nel primo slot del barile")
+                    
                     repeat
                         moneyKey = getPrintedMoney()
                         sleep(0.5)
@@ -387,11 +387,13 @@ else
                         redstone.setAnalogOutput("bottom", 15)
                         tornareIndietroFunzione(7)
                     else
+                        monitor.clear()
                         monitor.setCursorPos(1,1)
                         monitor.write("Banconota non registrata. Contattare le autorità per aiuto!")
                         tornareIndietroFunzione(7)
                     end
                 else
+                    monitor.clear()
                     monitor.setCursorPos(1,1)
                     monitor.write("Errore: " .. resp.error)
                     tornareIndietroFunzione(7)
