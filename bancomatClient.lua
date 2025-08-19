@@ -85,28 +85,24 @@ while true do
         monitor.write("Saldo: " .. resp.saldo)
 
     elseif scelta == "2" then
-        write("Quantità da depositare: ")
-        local q = tonumber(read())
-        if q and q > 0 then
-            write("Inserire i soldi da depositare nel primo slot del barile")
-            repeat
-                moneyKey = getPrintedMoney()
-                sleep(0.5)
-            until moneyKey
-            
-            local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
-            if resp.success then
-                print("Deposito effettuato! Saldo: " .. resp.saldo)
-                monitor.clear()
-                monitor.setCursorPos(1,1)
-                monitor.write("Saldo: " .. resp.saldo)
-            else
-                print("Banconota non valida")
-                print("Errore" .. resp.error)
-            end
-      
+        write("Inserire i soldi da depositare nel primo slot del barile")
+        repeat
+            moneyKey = getPrintedMoney()
+            sleep(0.5)
+        until moneyKey
+        
+        local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
+        if resp.success then
+            print("Deposito effettuato! Saldo: " .. resp.saldo)
+            monitor.clear()
+            monitor.setCursorPos(1,2)
+            monitor.write("Saldo: " .. resp.saldo)
+        else
+            monitor.setCursorPos(1,2)
+            print("Banconota non valida")
+            monitor.setCursorPos(1,3)
+            print("Errore" .. resp.error)
         end
-
     elseif scelta == "3" then
         write("Quantità da prelevare: ")
         local q = tonumber(read())
