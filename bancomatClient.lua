@@ -26,31 +26,60 @@ local function getCreditCard()
     return key, name
 end
 
-local function getPin()
-    local card = chest.getItemDetail(1)
-    if not card then 
-        redstone.setAnalogOutput("bottom", 0)
-        return nil 
-    end
-    if card.name ~= "minecraft:paper" or card.count ~= 1 or card.nbt == nil then
-        monitor.clear()
-        monitor.setCursorPos(1,1)
-        monitor.write("Carta di credito non valida. Perfavore inserire una carta valida")
-        redstone.setAnalogOutput("bottom", 0)
-        return nil
-    end
-    
-    -- Controllo che displayName sia solo un numero
-    local pin = card.displayName
-    if tonumber(pin) == nil then
-        redstone.setAnalogOutput("bottom", 0)
-        monitor.clear()
-        monitor.setCursorPos(1,1)
-        monitor.write("Pin non valido. Perfavore inserire un pin valido")
-        return nil
-    end
+local function numPad(_x, _y)
+    monitor.clear()
+    local curN = 1
 
-    return pin
+    for y = 1, 4 do
+        for x = 1, 3 do
+            if y == 4 then
+                monitor.setCursorPos(2 * _x, y * _y)
+                monitor.write("0")
+
+                monitor.setCursorPos(1 * _x, y +1 * y)
+                monitor.write("confirm")
+
+                monitor.setCursorPos(3 * _x, y +1 * y)
+                monitor.write("del")
+                break
+            end
+            monitor.setCursorPos(x * _x, y * _y)
+            monitor.write(curN)
+            curN = curN + 1
+        end
+    end
+end
+
+local function getNumPadPress(_x, _y)
+    local event, side, touchX, touchY
+    repeat
+        event, side, touchX, touchY = os.pullEvent("monitor_touch")
+    until touchX and touchY
+
+    -- calcola la colonna e riga premuta
+    local col = math.ceil(touchX / _x)
+    local row = math.ceil(touchY / _y)
+
+    -- gestisci il tasto premuto
+    if row == 4 then
+        if col == 2 then
+            return "0"
+        elseif col == 1 then
+            return "confirm"
+        elseif col == 3 then
+            return "del"
+        end
+    else
+        return (row - 1) * 3 + col  -- converte riga/colonna in numero 1-9
+    end
+end
+
+local function getPin()
+    local pin
+    local offset = 2
+    numPad(offset,offset)
+    local tasto = getNumPadPress(offset, offset)
+    print(tasto)
 end
 
 local function getPrintedMoney()
