@@ -31,6 +31,9 @@ local function getPin()
         return nil 
     end
     if card.name ~= "minecraft:paper" or card.count ~= 1 or card.nbt == nil then
+        monitor.clear()
+        monitor.setCursorPos(1,1)
+        monitor.write("Carta di credito non valida. Perfavore inserire una carta valida")
         redstone.setAnalogOutput("bottom", 0)
         return nil
     end
@@ -39,6 +42,9 @@ local function getPin()
     local pin = card.displayName
     if tonumber(pin) == nil then
         redstone.setAnalogOutput("bottom", 0)
+        monitor.clear()
+        monitor.setCursorPos(1,1)
+        monitor.write("Pin non valido. Perfavore inserire un pin valido")
         return nil
     end
 
@@ -75,8 +81,13 @@ end
 
 
 -- Login
-print("=== BANCOMAT ===")
-print("Inserire carta di credito nel primo slot della chest...")
+print()
+print()
+monitor.clear()
+monitor.setCursorPos(1,1)
+monitor.write("=== BANCOMAT ===")
+monitor.setCursorPos(1,3)
+monitor.write("Inserire carta di credito nel dispenser e premere il pulsante...")
 
 redstone.setAnalogOutput("bottom", 15)
 redstone.setAnalogOutput("back", 0)
@@ -91,6 +102,12 @@ until cardKey
 
 redstone.setAnalogOutput("bottom", 0)
 sleep(0.3)
+
+monitor.clear()
+monitor.setCursorPos(1,1)
+monitor.write("=== BANCOMAT ===")
+monitor.setCursorPos(1,3)
+monitor.write("Inserire il pin scritto sulla carta nel dispenser e premere il pulsante...")
 
 local pin
     
