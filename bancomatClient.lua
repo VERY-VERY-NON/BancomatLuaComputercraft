@@ -99,7 +99,7 @@ local cardKey, cardName
 repeat
     redstone.setAnalogOutput("bottom", 15)
     cardKey, cardName = getCreditCard()
-    sleep(0.5)
+    sleep(1)
 until cardKey
 
 redstone.setAnalogOutput("bottom", 0)
@@ -116,7 +116,7 @@ local pin
 repeat
     redstone.setAnalogOutput("bottom", 15)
     pin = getPin()
-    sleep(0.5)
+    sleep(1)
 until pin
 
 redstone.setAnalogOutput("bottom", 0)
