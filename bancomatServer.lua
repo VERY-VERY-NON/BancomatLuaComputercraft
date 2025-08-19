@@ -110,6 +110,9 @@ while true do
             response.saldo = accounts[cardKey].saldo
             response.moneyCurId = moneyCurId
             moneyCurId = moneyCurId + 1
+        else
+            response.success = false
+            response.error = "Soldi insufficenti per il prelievo"
         end
     elseif msg.cmd == "registra soldi" then
         local moneyKey = msg.moneyKey
