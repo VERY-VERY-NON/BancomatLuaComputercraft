@@ -51,12 +51,17 @@ print("=== BANCOMAT ===")
 print("Inserire carta di credito nel primo slot della chest...")
 
 redstone.setAnalogOutput("bottom", 15)
+redstone.setAnalogOutput("back", 15)
 
 local cardKey, cardName
 repeat
+    redstone.setAnalogOutput("back", 0)
+    redstone.setAnalogOutput("bottom", 15)
     cardKey, cardName = getCreditCard()
     sleep(0.5)
+    redstone.setAnalogOutput("bottom", 0)
 until cardKey
+redstone.setAnalogOutput("back", 15)
 
 write("Pin: ")
 local pin = read("*")
