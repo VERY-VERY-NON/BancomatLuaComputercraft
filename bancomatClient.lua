@@ -1,6 +1,7 @@
 local monitor = peripheral.find("monitor") or error("Nessun monitor")
 local printer = peripheral.find("printer") or error("Nessun printer")
 local chest = peripheral.find("minecraft:chest") or error("Nessuna chest")
+local barrel = peripheral.find("minecraft:barrel") or error("Nessun barrel")
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(2) -- canale client
 
@@ -14,6 +15,17 @@ local function getCreditCard()
     
     local key = card.nbt
     return key, card.displayName
+end
+
+local function getPrintedMoney()
+    local money = chest.getItemDetail(1)
+    if not money then return nil end
+    if money.name ~= "computercraft:printed_page" then return nil end
+    if money.count ~= 1 then return nil end
+    if money.nbt ~= nil then return nil end
+    
+    local key = money.nbt
+    return key
 end
 
 -- Funzione per comunicare col server
@@ -105,10 +117,24 @@ while true do
 
                 printer.write("Prelievo: ")
                 printer.write(q)
-                
+
                 -- And finally print the page!
                 if not printer.endPage() then
                   error("Cannot end the page. Is there enough space?")
+                end
+
+                
+                local moneyKey
+                repeat
+                    moneyKey = getPrintedMoney()
+                    sleep(0.5)
+                until moneyKey
+                local resp = sendRequest({cmd="preleva", moneyKey=moneyKey, amount=q})
+
+                if resp.success then
+                    print("Money registrati con sucesso")
+                else
+                    print("Money non registrati con sucesso")
                 end
             else
                 print("Errore: " .. resp.error)
