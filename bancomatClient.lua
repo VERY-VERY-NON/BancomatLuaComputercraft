@@ -126,11 +126,12 @@ while true do
 
                 
                 local moneyKey
+                write("Inserire i soldi stampati nel primo slot del barile")
                 repeat
                     moneyKey = getPrintedMoney()
                     sleep(0.5)
                 until moneyKey
-                local resp = sendRequest({cmd="preleva",cardKey=cardKey, moneyKey=moneyKey, amount=q})
+                local resp = sendRequest({cmd="registra soldi",cardKey=cardKey, moneyKey=moneyKey, amount=q})
 
                 if resp.success then
                     print("Money registrati con sucesso")
