@@ -42,12 +42,16 @@ local function numPad(_x, _y,accountEsiste)
                 monitor.setCursorPos(3 * _x, (y +1) * y)
                 monitor.write("del")
 
-                monitor.setCursorPos(6 * _x, y * y)
+                monitor.setCursorPos(6 * _x, 1)
+                
                 if accountEsiste then
                     monitor.write("Inserire pin della carta")
                 else
-                    monitor.write("Impostare il pin della nuova carta")
+                    monitor.write("Impostare il pin ")
+                    monitor.setCursorPos(6 * _x, 3)
+                    monitor.write("della nuova carta")
                 end
+                
                 break
             end
             monitor.setCursorPos(x * _x, y * _y)
@@ -102,7 +106,7 @@ local function getPin(accountEsiste)
         print(tasto)
         if tonumber(tasto) then
             pin = pin .. tasto
-        else if tasto == "del" then
+        elseif tasto == "del" then
             pin = pin:sub(1, -2)
         end
     until tasto == "ok" or #pin == 8
