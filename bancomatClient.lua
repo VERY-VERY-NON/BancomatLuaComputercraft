@@ -11,18 +11,18 @@ local function getCreditCard()
     if not card then return nil end
     if card.name ~= "minecraft:paper" then return nil end
     if card.count ~= 1 then return nil end
-    if card.nbt ~= nil then return nil end
+    if card.nbt == nil then return nil end
     
     local key = card.nbt
     return key, card.displayName
 end
 
 local function getPrintedMoney()
-    local money = chest.getItemDetail(1)
+    local money = barrel.getItemDetail(1)
     if not money then return nil end
     if money.name ~= "computercraft:printed_page" then return nil end
     if money.count ~= 1 then return nil end
-    if money.nbt ~= nil then return nil end
+    if money.nbt == nil then return nil end
     
     local key = money.nbt
     return key
@@ -59,6 +59,7 @@ write("Pin: ")
 local pin = read("*")
 
 local loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
+
 if not loginResponse.success then
     print("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
 else
