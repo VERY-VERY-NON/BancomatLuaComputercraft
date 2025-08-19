@@ -29,9 +29,18 @@ end
 local function getPin()
     local card = chest.getItemDetail(1)
     if not card then return nil end
-    if card.name ~= "minecraft:paper" then return nil end
-    if card.count ~= 1 then return nil end
-    if card.nbt == nil then return nil end
+    if card.name ~= "minecraft:paper" then
+        redstone.setAnalogOutput("bottom", 0)
+        return nil
+    end
+    if card.count ~= 1 then
+        redstone.setAnalogOutput("bottom", 0)
+        return nil
+    end
+    if card.nbt == nil then
+        redstone.setAnalogOutput("bottom", 0)
+        return nil
+    end
     
     return card.displayName
 end
@@ -80,13 +89,19 @@ repeat
     sleep(0.5)
 until cardKey
 
-sleep(0.5)
+redstone.setAnalogOutput("bottom", 0)
+sleep(0.3)
+
 local pin
     
 repeat
     pin = getPin()
+    redstone.setAnalogOutput("bottom", 15)
     sleep(0.5)
 until pin
+
+redstone.setAnalogOutput("bottom", 0)
+sleep(0.3)
 redstone.setAnalogOutput("back", 15)
 redstone.setAnalogOutput("bottom", 15)
 
