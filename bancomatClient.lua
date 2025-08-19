@@ -49,6 +49,9 @@ end
 -- Login
 print("=== BANCOMAT ===")
 print("Inserire carta di credito nel primo slot della chest...")
+
+redstone.setAnalogOutput("bottom", 15)
+
 local cardKey, cardName
 repeat
     cardKey, cardName = getCreditCard()
@@ -144,6 +147,10 @@ while true do
 
                 if resp.success then
                     print("Money registrati con sucesso")
+                    redstone.setAnalogOutput("bottom", 0)
+                    sleep(0.1)
+                    redstone.setAnalogOutput("bottom", 15)
+
                 else
                     print("Money non registrati con sucesso")
                 end
