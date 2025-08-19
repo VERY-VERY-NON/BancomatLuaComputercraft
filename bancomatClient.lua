@@ -244,6 +244,8 @@ if attempt == 4 then
     monitor.clear()
     monitor.setCursorPos(1,1)
     monitor.write("Troppi tentativi effettuati")
+    tornareIndietroFunzione(7)
+    break
 end
 print("Login effettuato! Saldo: " .. loginResponse.saldo)
 
