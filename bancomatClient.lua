@@ -5,6 +5,7 @@ local barrel = peripheral.find("minecraft:barrel") or error("Nessun barrel")
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(2) -- canale client
 
+
 monitor.setTextScale(0.5)
 
 -- Funzione carta
