@@ -80,11 +80,12 @@ repeat
     redstone.setAnalogOutput("bottom", 15)
 until cardKey
 
+sleep(0.5)
 local pin
-    pint = getPin()
-    sleep(0.5)
+    
 repeat
-
+    pin = getPin()
+    sleep(0.5)
 until pin
 redstone.setAnalogOutput("back", 15)
 redstone.setAnalogOutput("bottom", 15)
