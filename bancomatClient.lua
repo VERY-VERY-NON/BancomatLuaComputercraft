@@ -148,7 +148,7 @@ while true do
                 if resp.success then
                     print("Money registrati con sucesso")
                     redstone.setAnalogOutput("bottom", 0)
-                    sleep(0.1)
+                    sleep(0.2)
                     redstone.setAnalogOutput("bottom", 15)
 
                 else
