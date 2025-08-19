@@ -71,7 +71,7 @@ while true do
             response.success = true
             response.saldo = 0
         end
-    else if msg.cd == "esiste account" then
+    else if msg.cmd == "esiste account" then
             local cardKey = msg.cardKey
             if accounts[cardKey] then
                 response.success = true
