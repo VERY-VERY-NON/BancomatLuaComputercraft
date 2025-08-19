@@ -85,7 +85,6 @@ while true do
         if money[moneyKey] and money[moneyKey].quanti == quanti then
             accounts[cardKey].saldo = (accounts[cardKey].saldo or 0) + quanti
             money[moneyKey] = nil
-            moneyCurId = moneyCurId - 1
             salva()
             response.success = true
             response.saldo = accounts[cardKey].saldo
