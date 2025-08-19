@@ -99,6 +99,7 @@ end
 local function getPin(accountEsiste)
     local tasto
     local pin = ""
+    local hiddenPin = ""
     local offset = 2
     numPad(offset,offset,accountEsiste)
     repeat
@@ -106,9 +107,16 @@ local function getPin(accountEsiste)
         print(tasto)
         if tonumber(tasto) then
             pin = pin .. tasto
+            hiddenPin = hiddenPin .. "*"
         elseif tasto == "del" then
             pin = pin:sub(1, -2)
+            hiddenPin = pin:sub(1, -2)
         end
+
+        monitor.setCursorPos(12, 8)
+        monitor.clearLine()
+        monitor.write(hiddenPin)
+        
     until tasto == "ok" or #pin == 8
 
     return pin
