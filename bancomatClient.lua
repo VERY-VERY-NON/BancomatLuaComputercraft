@@ -96,6 +96,11 @@ while true do
                 printer.setPageTitle("CreditiSociali")
                 printer.write("<<Ricevuta Crediti Sociali>>")
                 printer.setCursorPos(1, 3)
+                printer.write("User: ")
+                printer.write(cardKey)
+
+                printer.setCursorPos(1, 5)
+
                 printer.write("Prelievo: ")
                 printer.write(q)
                 
