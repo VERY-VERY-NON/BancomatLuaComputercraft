@@ -44,10 +44,12 @@ local function numPad(_x, _y,accountEsiste)
                 monitor.write("del")
 
                 monitor.setCursorPos(6 * _x, 1)
-                
-                if accountEsiste then
+
+                if accountEsiste == nil then
+                    monitor.write("Inserire quantità")
+                elseif accountEsiste == true then
                     monitor.write("Inserire pin della carta")
-                else
+                elseif accountEsiste == false then
                     monitor.write("Impostare il pin ")
                     monitor.setCursorPos(6 * _x, 3)
                     monitor.write("della nuova carta")
@@ -96,6 +98,30 @@ local function getNumPadPress(_x, _y)
     end
 end
 
+local function getPrelievo()
+    local tasto
+    local q = ""
+    local offset = 2
+    
+    numPad(offset,offset,nil)
+    repeat
+        tasto = getNumPadPress(offset, offset)
+        print(tasto)
+        if tonumber(tasto) then
+            q = q .. tasto
+        elseif tasto == "del" then
+            if #q > 0 then
+                q = q:sub(1, -2)
+            end
+        end
+
+        monitor.setCursorPos(12, 8)
+        monitor.clearLine()
+        monitor.write(q)
+    until (tasto == "ok" and #q > 0)
+
+    return q
+end
 
 local function getPin(accountEsiste)
     local tasto
@@ -299,7 +325,13 @@ else
             end
         elseif scelta == 3 then
             write("Quantità da prelevare: ")
-            local q = tonumber(read())
+            local q 
+            
+            repeat
+                q = getPin(accountEsiste)
+                sleep(0.5)
+            until q
+            
             if q and q > 0 then
                 local resp = sendRequest({cmd="preleva", cardKey=cardKey, amount=q})
                 if resp.success then
