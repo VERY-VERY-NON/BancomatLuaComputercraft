@@ -97,8 +97,8 @@ redstone.setAnalogOutput("back", 0)
 local cardKey, cardName
 
 repeat
-    redstone.setAnalogOutput("bottom", 15)
     cardKey, cardName = getCreditCard()
+    redstone.setAnalogOutput("bottom", 15)
     sleep(1)
 until cardKey
 
@@ -114,8 +114,8 @@ monitor.write("Inserire il pin scritto sulla carta nel dispenser e premere il pu
 local pin
     
 repeat
-    redstone.setAnalogOutput("bottom", 15)
     pin = getPin()
+    redstone.setAnalogOutput("bottom", 15)
     sleep(1)
 until pin
 
