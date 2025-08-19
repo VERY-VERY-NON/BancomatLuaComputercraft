@@ -53,6 +53,8 @@ local function numPad(_x, _y, type)
                     monitor.write("Impostare il pin ")
                     monitor.setCursorPos(6 * _x, 3)
                     monitor.write("della nuova carta")
+                else
+                    print("Errore nel numpad -57")
                 end
                 
                 break
@@ -115,7 +117,7 @@ local function getPrelievo()
             end
         end
 
-        monitor.setCursorPos(12, 8)
+        monitor.setCursorPos(12, 7)
         monitor.clearLine()
         monitor.write(q)
     until (tasto == "ok" and #q > 0)
@@ -148,7 +150,7 @@ local function getPin(accountEsiste)
             end
         end
 
-        monitor.setCursorPos(12, 8)
+        monitor.setCursorPos(12, 7)
         monitor.clearLine()
         monitor.write(hiddenPin)
         
@@ -259,7 +261,7 @@ repeat
     local pin
     
     repeat
-        pin = getPin(accountEsiste)
+        pin = getPrelievo(accountEsiste)
         sleep(0.5)
     until pin
         
