@@ -9,9 +9,18 @@ modem.open(2) -- canale client
 local function getCreditCard()
     local card = chest.getItemDetail(1)
     if not card then return nil end
-    if card.name ~= "minecraft:paper" then return nil end
-    if card.count ~= 1 then return nil end
-    if card.nbt == nil then return nil end
+    if card.name ~= "minecraft:paper"then
+        redstone.setAnalogOutput("bottom", 0)
+        return nil
+    end
+    if card.count ~= 1 then
+        redstone.setAnalogOutput("bottom", 0)
+        return nil
+    end
+    if card.nbt == nil then
+        redstone.setAnalogOutput("bottom", 0)
+        return nil
+    end
     
     local key = card.nbt
     return key, card.displayName
@@ -61,15 +70,14 @@ print("=== BANCOMAT ===")
 print("Inserire carta di credito nel primo slot della chest...")
 
 redstone.setAnalogOutput("bottom", 15)
-redstone.setAnalogOutput("back", 15)
+redstone.setAnalogOutput("back", 0)
 
 local cardKey, cardName
+
 repeat
-    redstone.setAnalogOutput("back", 0)
-    redstone.setAnalogOutput("bottom", 15)
     cardKey, cardName = getCreditCard()
     sleep(0.5)
-    redstone.setAnalogOutput("bottom", 0)
+    redstone.setAnalogOutput("bottom", 15)
 until cardKey
 
 local pin
