@@ -17,6 +17,16 @@ local function getCreditCard()
     return key, card.displayName
 end
 
+local function getPin()
+    local card = chest.getItemDetail(1)
+    if not card then return nil end
+    if card.name ~= "minecraft:paper" then return nil end
+    if card.count ~= 1 then return nil end
+    if card.nbt == nil then return nil end
+    
+    return card.displayName
+end
+
 local function getPrintedMoney()
     local money = barrel.getItemDetail(1)
     if not money then return nil end
@@ -61,10 +71,16 @@ repeat
     sleep(0.5)
     redstone.setAnalogOutput("bottom", 0)
 until cardKey
-redstone.setAnalogOutput("back", 15)
 
-write("Pin: ")
-local pin = read("*")
+local pin
+    pint = getPin()
+    sleep(0.5)
+repeat
+
+until pin
+redstone.setAnalogOutput("back", 15)
+redstone.setAnalogOutput("bottom", 15)
+
 
 local loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
 
