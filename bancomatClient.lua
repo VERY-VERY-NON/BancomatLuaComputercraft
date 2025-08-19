@@ -64,6 +64,35 @@ local function getPrintedMoney()
     return key
 end
 
+local function scriviSceltaMonitor()
+    
+    local offset = 1
+    local add = 2
+    
+    monitor.clear()
+    monitor.setCursorPos(1,offset)
+    offset = offset + add
+    monitor.write("1) Saldo attuale")
+    monitor.setCursorPos(1,offset)
+    offset = offset + add
+    monitor.write("2) Deposito")
+    monitor.setCursorPos(1,offset)
+    offset = offset + add
+    monitor.write("3) Prelievo")
+    monitor.setCursorPos(1,offset)
+    offset = offset + add
+    monitor.write("4) Esci")
+end
+
+local function tornareIndietroFunzione(offsetY)
+    monitor.setCursorPos(1,offsetY)
+    monitor.write("Indietro")
+    local event, side, x, y
+    repeat 
+        event, side, x, y = os.pullEvent("monitor_touch")
+        sleep(0.2)
+    until y
+end
 -- Funzione per comunicare col server
 local function sendRequest(msg)
     modem.transmit(1, 2, msg) -- invia al server
@@ -83,8 +112,6 @@ end
 
 
 -- Login
-print()
-print()
 monitor.clear()
 monitor.setCursorPos(1,1)
 monitor.write("=== BANCOMAT ===")
@@ -135,25 +162,10 @@ else
     print("Login effettuato! Saldo: " .. loginResponse.saldo)
 end
 
-local offset = 1
-local add = 2
-
-monitor.clear()
-monitor.setCursorPos(1,offset)
-offset = offset + add
-monitor.write("1) Saldo attuale")
-monitor.setCursorPos(1,offset)
-offset = offset + add
-monitor.write("2) Deposito")
-monitor.setCursorPos(1,offset)
-offset = offset + add
-monitor.write("3) Prelievo")
-monitor.setCursorPos(1,offset)
-offset = offset + add
-monitor.write("4) Esci")
-
 -- Loop principale
 while true do
+
+    scriviSceltaMonitor()
     
     local scelta
      local event, side, x, y
@@ -164,13 +176,14 @@ while true do
 
     scelta = math.ceil(y / 2)
     scelta = math.max(1, math.min(4, scelta)) 
-    
+    print(scelta)
     if scelta == "1" then
         local resp = sendRequest({cmd="saldo", cardKey=cardKey})
         print("Saldo: " .. resp.saldo)
         monitor.clear()
         monitor.setCursorPos(1,1)
         monitor.write("Saldo: " .. resp.saldo)
+        tornareIndietroFunzione(7)
 
     elseif scelta == "2" then
         write("Inserire i soldi da depositare nel primo slot del barile")
@@ -185,11 +198,13 @@ while true do
             monitor.clear()
             monitor.setCursorPos(1,2)
             monitor.write("Saldo: " .. resp.saldo)
+            tornareIndietroFunzione(7)
         else
             monitor.setCursorPos(1,2)
-            print("Banconota non valida")
+            monitor.write("Banconota non valida")
             monitor.setCursorPos(1,3)
-            print("Errore" .. resp.error)
+            monitor.write("Errore" .. resp.error)
+            tornareIndietroFunzione(7)
         end
     elseif scelta == "3" then
         write("Quantità da prelevare: ")
@@ -218,7 +233,11 @@ while true do
 
                 -- And finally print the page!
                 if not printer.endPage() then
-                  error("Cannot end the page. Is there enough space?")
+                    monitor.clear()
+                    monitor.setCursorPos(1,1)
+                    monitor.write("Impossibile stampare la banconota. Contattare le autorità per aiuto")
+                    tornareIndietroFunzione(7)
+                    return nil
                 end
 
                 
@@ -231,13 +250,17 @@ while true do
                 local resp = sendRequest({cmd="registra soldi",cardKey=cardKey, moneyKey=moneyKey, amount=q})
 
                 if resp.success then
-                    print("Money registrati con sucesso")
+                    monitor.clear()
+                    monitor.setCursorPos(1,1)
+                    monitor.write("Banconota registrati con sucesso")
                     redstone.setAnalogOutput("bottom", 0)
                     sleep(0.2)
                     redstone.setAnalogOutput("bottom", 15)
-
+                    tornareIndietroFunzione(7)
                 else
-                    print("Money non registrati con sucesso")
+                    monitor.setCursorPos(1,1)
+                    monitor.write("Banconota non registrata. Contattare le autorità per aiuto!")
+                    tornareIndietroFunzione(7)
                 end
             else
                 print("Errore: " .. resp.error)
@@ -250,7 +273,10 @@ while true do
     elseif scelta == "4" then
         break
     else
-        print("Scelta non valida")
+        monitor.clear()
+        monitor.setCursorPos(1,1)
+        monitor.write("Scelta non valida")
+        tornareIndietroFunzione(7)
     end
 end
 
