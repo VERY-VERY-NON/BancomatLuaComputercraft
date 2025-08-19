@@ -93,6 +93,7 @@ while true do
             salva()
             response.success = true
             response.saldo = accounts[cardKey].saldo
+        end
     elseif msg.cmd == "registra soldi" then
         local moneyKey = msg.moneyKey
         local quanti = msg.amount or 0
@@ -118,4 +119,5 @@ while true do
     modem.transmit(replyChannel, 1, response)
 
     ::continue::
+
 end
