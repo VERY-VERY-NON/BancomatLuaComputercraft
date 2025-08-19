@@ -311,12 +311,12 @@ else
         elseif scelta == 2 then
             monitor.clear()
             monitor.setCursorPos(1,1)
-            monitor.write("Inserire i soldi da depositare")
+            monitor.write("Inserire i soldi da depositare nel")
             monitor.setCursorPos(1,3)
-            monitor.write(" nel primo slot del barile.")
-            monitor.setCurosrPos(1,5)
+            monitor.write(" dispenser e premere il pulsante.")
+            monitor.setCursorPos(1,5)
             monitor.write("Premere sullo schermo ")
-            monitor.setCurosrPos(1,7)
+            monitor.setCursorPos(1,7)
             monitor.write("per andare indietro")
             local event, side, x, y
             repeat
