@@ -245,126 +245,127 @@ if attempt == 4 then
     monitor.setCursorPos(1,1)
     monitor.write("Troppi tentativi effettuati")
     tornareIndietroFunzione(7)
-    break
-end
-print("Login effettuato! Saldo: " .. loginResponse.saldo)
+else
+    print("Login effettuato! Saldo: " .. loginResponse.saldo)
 
--- Loop principale
-while true do
-
-    scriviSceltaMonitor()
+    -- Loop principale
+    while true do
     
-    local scelta
-     local event, side, x, y
-    repeat 
-        event, side, x, y = os.pullEvent("monitor_touch")
-        sleep(0.2)
-    until y
-
-    scelta = math.ceil(y / 2)
-    scelta = math.max(1, math.min(4, scelta)) 
-    print(scelta)
-    if scelta == "1" then
-        local resp = sendRequest({cmd="saldo", cardKey=cardKey})
-        print("Saldo: " .. resp.saldo)
-        monitor.clear()
-        monitor.setCursorPos(1,1)
-        monitor.write("Saldo: " .. resp.saldo)
-        tornareIndietroFunzione(7)
-
-    elseif scelta == "2" then
-        write("Inserire i soldi da depositare nel primo slot del barile")
-        repeat
-            moneyKey = getPrintedMoney()
-            sleep(0.5)
-        until moneyKey
+        scriviSceltaMonitor()
         
-        local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
-        if resp.success then
-            print("Deposito effettuato! Saldo: " .. resp.saldo)
-            monitor.clear()
-            monitor.setCursorPos(1,2)
-            monitor.write("Saldo: " .. resp.saldo)
-            tornareIndietroFunzione(7)
-        else
-            monitor.setCursorPos(1,2)
-            monitor.write("Banconota non valida")
-            monitor.setCursorPos(1,3)
-            monitor.write("Errore" .. resp.error)
-            tornareIndietroFunzione(7)
-        end
-    elseif scelta == "3" then
-        write("Quantità da prelevare: ")
-        local q = tonumber(read())
-        if q and q > 0 then
-            local resp = sendRequest({cmd="preleva", cardKey=cardKey, amount=q})
-            if resp.success then
-                print("Prelievo effettuato! Saldo: " .. resp.saldo)
-                -- Start a new page, or print an error.
-                if not printer.newPage() then
-                  error("Cannot start a new page. Do you have ink and paper?")
-                end
-                
-                -- Write to the page
-                printer.setPageTitle("CreditiSociali")
-                printer.write("<<Ricevuta Crediti Sociali>>")
-                printer.setCursorPos(1, 3)
-                printer.write("User: ")
-                printer.write(cardKey)
-                
-                printer.setCursorPos(1, 5)
-                printer.write(resp.moneyCurId)
-                printer.setCursorPos(1, 7)
-                printer.write("Prelievo: ")
-                printer.write(q)
-
-                -- And finally print the page!
-                if not printer.endPage() then
-                    monitor.clear()
-                    monitor.setCursorPos(1,1)
-                    monitor.write("Impossibile stampare la banconota. Contattare le autorità per aiuto")
-                    tornareIndietroFunzione(7)
-                    return nil
-                end
-
-                
-                local moneyKey
-                write("Inserire i soldi stampati nel primo slot del barile")
-                repeat
-                    moneyKey = getPrintedMoney()
-                    sleep(0.5)
-                until moneyKey
-                local resp = sendRequest({cmd="registra soldi",cardKey=cardKey, moneyKey=moneyKey, amount=q})
-
-                if resp.success then
-                    monitor.clear()
-                    monitor.setCursorPos(1,1)
-                    monitor.write("Banconota registrati con sucesso")
-                    redstone.setAnalogOutput("bottom", 0)
-                    sleep(0.2)
-                    redstone.setAnalogOutput("bottom", 15)
-                    tornareIndietroFunzione(7)
-                else
-                    monitor.setCursorPos(1,1)
-                    monitor.write("Banconota non registrata. Contattare le autorità per aiuto!")
-                    tornareIndietroFunzione(7)
-                end
-            else
-                print("Errore: " .. resp.error)
-            end
+        local scelta
+         local event, side, x, y
+        repeat 
+            event, side, x, y = os.pullEvent("monitor_touch")
+            sleep(0.2)
+        until y
+    
+        scelta = math.ceil(y / 2)
+        scelta = math.max(1, math.min(4, scelta)) 
+        print(scelta)
+        if scelta == "1" then
+            local resp = sendRequest({cmd="saldo", cardKey=cardKey})
+            print("Saldo: " .. resp.saldo)
             monitor.clear()
             monitor.setCursorPos(1,1)
             monitor.write("Saldo: " .. resp.saldo)
+            tornareIndietroFunzione(7)
+    
+        elseif scelta == "2" then
+            write("Inserire i soldi da depositare nel primo slot del barile")
+            repeat
+                moneyKey = getPrintedMoney()
+                sleep(0.5)
+            until moneyKey
+            
+            local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
+            if resp.success then
+                print("Deposito effettuato! Saldo: " .. resp.saldo)
+                monitor.clear()
+                monitor.setCursorPos(1,2)
+                monitor.write("Saldo: " .. resp.saldo)
+                tornareIndietroFunzione(7)
+            else
+                monitor.setCursorPos(1,2)
+                monitor.write("Banconota non valida")
+                monitor.setCursorPos(1,3)
+                monitor.write("Errore" .. resp.error)
+                tornareIndietroFunzione(7)
+            end
+        elseif scelta == "3" then
+            write("Quantità da prelevare: ")
+            local q = tonumber(read())
+            if q and q > 0 then
+                local resp = sendRequest({cmd="preleva", cardKey=cardKey, amount=q})
+                if resp.success then
+                    print("Prelievo effettuato! Saldo: " .. resp.saldo)
+                    -- Start a new page, or print an error.
+                    if not printer.newPage() then
+                      error("Cannot start a new page. Do you have ink and paper?")
+                    end
+                    
+                    -- Write to the page
+                    printer.setPageTitle("CreditiSociali")
+                    printer.write("<<Ricevuta Crediti Sociali>>")
+                    printer.setCursorPos(1, 3)
+                    printer.write("User: ")
+                    printer.write(cardKey)
+                    
+                    printer.setCursorPos(1, 5)
+                    printer.write(resp.moneyCurId)
+                    printer.setCursorPos(1, 7)
+                    printer.write("Prelievo: ")
+                    printer.write(q)
+    
+                    -- And finally print the page!
+                    if not printer.endPage() then
+                        monitor.clear()
+                        monitor.setCursorPos(1,1)
+                        monitor.write("Impossibile stampare la banconota. Contattare le autorità per aiuto")
+                        tornareIndietroFunzione(7)
+                        return nil
+                    end
+    
+                    
+                    local moneyKey
+                    write("Inserire i soldi stampati nel primo slot del barile")
+                    repeat
+                        moneyKey = getPrintedMoney()
+                        sleep(0.5)
+                    until moneyKey
+                    local resp = sendRequest({cmd="registra soldi",cardKey=cardKey, moneyKey=moneyKey, amount=q})
+    
+                    if resp.success then
+                        monitor.clear()
+                        monitor.setCursorPos(1,1)
+                        monitor.write("Banconota registrati con sucesso")
+                        redstone.setAnalogOutput("bottom", 0)
+                        sleep(0.2)
+                        redstone.setAnalogOutput("bottom", 15)
+                        tornareIndietroFunzione(7)
+                    else
+                        monitor.setCursorPos(1,1)
+                        monitor.write("Banconota non registrata. Contattare le autorità per aiuto!")
+                        tornareIndietroFunzione(7)
+                    end
+                else
+                    print("Errore: " .. resp.error)
+                end
+                monitor.clear()
+                monitor.setCursorPos(1,1)
+                monitor.write("Saldo: " .. resp.saldo)
+            end
+    
+        elseif scelta == "4" then
+            break
+        else
+            monitor.clear()
+            monitor.setCursorPos(1,1)
+            monitor.write("Scelta non valida")
+            tornareIndietroFunzione(7)
         end
-
-    elseif scelta == "4" then
-        break
-    else
-        monitor.clear()
-        monitor.setCursorPos(1,1)
-        monitor.write("Scelta non valida")
-        tornareIndietroFunzione(7)
     end
+
 end
 
 monitor.clear()
