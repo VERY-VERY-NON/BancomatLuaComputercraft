@@ -138,7 +138,10 @@ monitor.clear()
 monitor.setCursorPos(1,1)
 monitor.write("=== BANCOMAT ===")
 monitor.setCursorPos(1,3)
-monitor.write("Inserire il pin scritto sulla carta nel dispenser e premere il pulsante...")
+monitor.write("Inserire il pin scritto su della carta")
+monitor.setCursorPos(1,5)
+monitor.write("nel dispenser e premere il pulsante...")
+
 
 local pin
     
@@ -153,14 +156,26 @@ sleep(0.3)
 redstone.setAnalogOutput("back", 15)
 redstone.setAnalogOutput("bottom", 15)
 
+local attempt = 1
+repeat 
+    local loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
+    
+    if not loginResponse.success then
+        monitor.clear()
+        monitor.setCursorPos(1,1)
+        monitor.write("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
+        attempt = attempt + 1
+        tornareIndietroFunzione(7)
+    end
 
-local loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
+until loginResponse.success or attempt == 4
 
-if not loginResponse.success then
-    print("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
-else
-    print("Login effettuato! Saldo: " .. loginResponse.saldo)
+if attempt == 4 then
+     monitor.clear()
+    monitor.setCursorPos(1,1)
+    monitor.write("Troppi tentativi effettuati"))
 end
+print("Login effettuato! Saldo: " .. loginResponse.saldo)
 
 -- Loop principale
 while true do
