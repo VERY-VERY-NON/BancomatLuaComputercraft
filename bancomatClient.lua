@@ -8,7 +8,7 @@ modem.open(2) -- canale client
 
 monitor.setTextScale(0.5)
 
--- Funzione carta
+-- Funzione carta asd
 local function getCreditCard()
     local card = chest.getItemDetail(1)
     if not card then 
