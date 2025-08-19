@@ -34,13 +34,13 @@ local function numPad(_x, _y,accountEsiste)
     for y = 1, 4 do
         for x = 1, 3 do
             if y == 4 then
-                monitor.setCursorPos(2 * _x, (y * _y) - _y)
+                monitor.setCursorPos(2 * _x, y * _y)
                 monitor.write("0")
 
-                monitor.setCursorPos(1 * _x, y * y)
+                monitor.setCursorPos(1 * _x, y * _y)
                 monitor.write("ok")
 
-                monitor.setCursorPos(3 * _x, y * y)
+                monitor.setCursorPos(3 * _x, y * _y)
                 monitor.write("del")
 
                 monitor.setCursorPos(6 * _x, 1)
@@ -55,7 +55,7 @@ local function numPad(_x, _y,accountEsiste)
                 
                 break
             end
-            monitor.setCursorPos(x * _x, (y * _y) - _y)
+            monitor.setCursorPos(x * _x, y * _y)
             monitor.write(curN)
             curN = curN + 1
         end
@@ -69,8 +69,8 @@ local function getNumPadPress(_x, _y)
     until touchX and touchY
 
     -- calcola la colonna e riga premuta
-    local col = math.ceil((touchX - _y) / _x)
-    local row = math.ceil((touchY - _y) / _y)
+    local col = math.ceil(touchX / _x)
+    local row = math.ceil(touchY / _y)
 
     -- verifica tasti validi
     if row >= 1 and row <= 4 and col >= 1 and col <= 3 then
