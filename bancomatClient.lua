@@ -337,7 +337,7 @@ else
                 q = getPrelievo()
                 sleep(0.5)
             until q
-            
+            q = tonumber(q)
             if q and q > 0 then
                 local resp = sendRequest({cmd="preleva", cardKey=cardKey, amount=q})
                 if resp.success then
@@ -392,7 +392,9 @@ else
                         tornareIndietroFunzione(7)
                     end
                 else
-                    print("Errore: " .. resp.error)
+                    monitor.setCursorPos(1,1)
+                    monitor.write("Errore: " .. resp.error)
+                    tornareIndietroFunzione(7)
                 end
                 monitor.clear()
                 monitor.setCursorPos(1,1)
