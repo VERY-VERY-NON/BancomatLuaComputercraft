@@ -27,7 +27,7 @@ local function getCreditCard()
     return key, name
 end
 
-local function numPad(_x, _y,accountEsiste)
+local function numPad(_x, _y, type)
     monitor.clear()
     local curN = 1
 
@@ -45,11 +45,11 @@ local function numPad(_x, _y,accountEsiste)
 
                 monitor.setCursorPos(6 * _x, 1)
 
-                if accountEsiste == nil then
+                if type == "quantità" then
                     monitor.write("Inserire quantità")
-                elseif accountEsiste == true then
+                elseif type == "pin" then
                     monitor.write("Inserire pin della carta")
-                elseif accountEsiste == false then
+                elseif type == "pin nuovo" then
                     monitor.write("Impostare il pin ")
                     monitor.setCursorPos(6 * _x, 3)
                     monitor.write("della nuova carta")
@@ -103,7 +103,7 @@ local function getPrelievo()
     local q = ""
     local offset = 2
     
-    numPad(offset,offset,nil)
+    numPad(offset,offset,"quantità")
     repeat
         tasto = getNumPadPress(offset, offset)
         print(tasto)
@@ -128,7 +128,11 @@ local function getPin(accountEsiste)
     local pin = ""
     local hiddenPin = ""
     local offset = 2
-    numPad(offset,offset,accountEsiste)
+    if accountEsiste then
+        numPad(offset,offset,"pin")
+    else
+        numPad(offset,offset,"pin nuovo")
+    end
     repeat
         tasto = getNumPadPress(offset, offset)
         print(tasto)
