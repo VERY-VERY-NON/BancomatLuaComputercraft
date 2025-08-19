@@ -10,7 +10,9 @@ local function getCreditCard()
     if not card then return nil end
     if card.name ~= "minecraft:paper" then return nil end
     if card.count ~= 1 then return nil end
-    local key = card.name .. ":" .. (card.nbt or "default")
+    if !card.nbt then return nil end
+    
+    local key = card.nbt
     return key, card.displayName
 end
 
