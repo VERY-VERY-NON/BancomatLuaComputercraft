@@ -115,7 +115,7 @@ while true do
                 printer.write(cardKey)
                 
                 printer.setCursorPos(1, 5)
-                printer.write(msg.moneyCurId.ToString())
+                printer.write(resp.moneyCurId)
                 printer.setCursorPos(1, 7)
                 printer.write("Prelievo: ")
                 printer.write(q)
