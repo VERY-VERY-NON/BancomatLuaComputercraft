@@ -206,15 +206,15 @@ while true do
         local cardKey = msg.cardKey
         local quanti = msg.amount or 0
 
-        response.success = true
         accounts[cardKey].saldo = accounts[cardKey].saldo + quanti
+        response.saldo = accounts[cardKey].saldo
     elseif msg.cmd == "rimuovi crediti" then
         elseif msg.cmd == "aggiungi crediti" then
         local cardKey = msg.cardKey
         local quanti = msg.amount or 0
 
-        response.success = true
         accounts[cardKey].saldo = accounts[cardKey].saldo - quanti
+        response.saldo = accounts[cardKey].saldo
     else
         response.success = false
         response.error = "Comando sconosciuto"
