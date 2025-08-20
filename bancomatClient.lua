@@ -1,7 +1,6 @@
 local monitor = peripheral.find("monitor") or error("Nessun monitor")
 local printer = peripheral.find("printer") or error("Nessun printer")
 local chest = peripheral.find("minecraft:chest") or error("Nessuna chest")
-local barrel = peripheral.find("minecraft:barrel") or error("Nessun barrel")
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(2) -- canale client
 
@@ -160,7 +159,7 @@ local function getPin(accountEsiste)
 end
 
 local function getPrintedMoney()
-    local money = barrel.getItemDetail(1)
+    local money = chest.getItemDetail(1)
     if not money then return nil end
     if money.name ~= "computercraft:printed_page" then return nil end
     if money.count ~= 1 then return nil end
@@ -322,9 +321,11 @@ else
             repeat
                 event, side, x, y = os.pullEvent("monitor_touch")
                 moneyKey = getPrintedMoney()
-                sleep(0.5)
+                sleep(0.2)
             until moneyKey or x
 
+            if x then return nil end
+                
             if moneyKey then
                 local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
                 if resp.success then
@@ -385,7 +386,10 @@ else
                         return nil
                     end
     
-                    
+                    redstone.setAnalogOutput("bottom", 0)
+                    sleep(0.2)
+                    redstone.setAnalogOutput("bottom", 15)
+
                     local moneyKey
                     
                     repeat
