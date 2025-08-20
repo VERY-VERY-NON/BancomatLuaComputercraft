@@ -176,7 +176,7 @@ local function getPrintedMoney(checkBarrel)
    
         if money and money.name == "computercraft:printed_page" and money.nbt then
             local key = money.nbt
-            return key, nil
+            return key
         end
 
         sleep(0.3)
@@ -187,7 +187,7 @@ end
 local function ascoltaMonitor()
     while true do
         local event, side, x, y = os.pullEvent("monitor_touch")
-        return nil, x
+        return "exit"
         
     end
 end
@@ -343,16 +343,17 @@ else
             monitor.write("per andare indietro")
             
             redstone.setAnalogOutput("back", 0)
-            moneyKey, x = parallel.waitForAny(
+            moneyKey = parallel.waitForAny(
                 ascoltaMonitor,
                 function() return getPrintedMoney(false) end
             )
 
             redstone.setAnalogOutput("back", 15)
 
-            if x then break end
-                
-            if moneyKey then
+            if moneyKey == "exit" then
+                print("Exit")
+            else
+                if moneyKey then
                 local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
                 if resp.success then
                     monitor.clear()
@@ -366,10 +367,13 @@ else
                     monitor.setCursorPos(1,3)
                     monitor.write("Errore" .. resp.error)
                     tornareIndietroFunzione(7)
+                    end
+                else
+                    monitor.clear()
                 end
-            else
-                monitor.clear()
             end
+                
+           
         elseif scelta == 3 then
             write("Quantità da prelevare: ")
             local q 
