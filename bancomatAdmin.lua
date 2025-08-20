@@ -80,8 +80,8 @@ local function rimuoviCartaDiCredito()
     end
     local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
     
-    if loginResponse.success == true then
-        write("Carta già esistente.\n")
+    if loginResponse.success == false then
+        write("Carta non esistente.\n")
         return false
     end
     write("Scrivere il pin della carta.\n")
