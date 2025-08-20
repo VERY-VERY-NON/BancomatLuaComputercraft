@@ -40,6 +40,11 @@ local function creaCartaDiCredito()
         write("Errore carta di credito non valida.\n")
         return false
     end
+    local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
+    if loginResponse.success == true then
+        write("Carta già esistente.\n")
+        return false
+    end
     write("Scrivere il pin della carta.\n")
     local pin = read()
     
