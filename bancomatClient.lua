@@ -310,11 +310,13 @@ else
 
     -- Loop principale
     while true do
+        redstone.setAnalogOutput("bottom", 0)
+        redstone.setAnalogOutput("back", 0)
 
         scriviSceltaMonitor()
         
         local scelta
-         local event, side, x, y
+        local event, side, x, y
         repeat 
             event, side, x, y = os.pullEvent("monitor_touch")
             sleep(0.2)
@@ -332,6 +334,7 @@ else
             tornareIndietroFunzione(7)
     
         elseif scelta == 2 then
+            redstone.setAnalogOutput("bottom", 15)
             monitor.clear()
             monitor.setCursorPos(1,1)
             monitor.write("Inserire i soldi da depositare nel")
@@ -375,6 +378,7 @@ else
                 
            
         elseif scelta == 3 then
+            redstone.setAnalogOutput("back", 15)
             write("Quantità da prelevare: ")
             local q 
             
