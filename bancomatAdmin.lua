@@ -147,6 +147,10 @@ while true do
         elseif response.success == true then
             write("Carta distrutta con successo \n")
         end 
+    elseif scelta == "3" then
+            aggiungiCreditiSociali()
+    elseif scelta == "4" then
+            rimuoviCreditiSociali()
     else
         write("scelta non esistente. \n")
     end
