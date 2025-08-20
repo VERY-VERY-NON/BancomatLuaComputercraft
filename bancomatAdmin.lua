@@ -92,11 +92,11 @@ local function aggiungiCreditiSociali()
 
     write("Scrivere quantità da aggiungere. \n")
     local q = read()
-    local loginResponse = sendRequest({cmd="aggiungi crediti", cardKey=cardKey, quanti=q})
+    local loginResponse = sendRequest({cmd="aggiungi crediti", cardKey=cardKey, amount=q})
 
     if loginResponse then
         write("Crediti aggiunti con successo.\n")
-        write("Saldo: " .. loginResponse.saldo)
+        write("Saldo: " .. loginResponse.saldo .. "\n")
     end
 
 end
@@ -108,13 +108,13 @@ local function rimuoviCreditiSociali()
         return false
     end
 
-    write("Scrivere quantità da aggiungere. \n")
+    write("Scrivere quantità da rimuovere. \n")
     local q = read()
-    local loginResponse = sendRequest({cmd="aggiungi crediti", cardKey=cardKey, quanti=q})
+    local loginResponse = sendRequest({cmd="rimuovi crediti", cardKey=cardKey, amount=q})
 
     if loginResponse then
-        write("Crediti aggiunti con successo.\n")
-        write("Saldo: " .. loginResponse.saldo)
+        write("Crediti rimossi con successo.\n")
+        write("Saldo: " .. loginResponse.saldo .. "\n")
     end
 end
 
