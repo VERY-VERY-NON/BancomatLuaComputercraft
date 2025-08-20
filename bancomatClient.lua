@@ -343,33 +343,33 @@ else
             monitor.write("per andare indietro")
             
             redstone.setAnalogOutput("back", 0)
-            moneyKey = parallel.waitForAny(
+            response = parallel.waitForAny(
                 ascoltaMonitor,
                 function() return getPrintedMoney(false) end
             )
-
-            redstone.setAnalogOutput("back", 15)
-
-            if moneyKey == "exit" then
-                print("Exit")
-            else
+            
+            if response == 1 then
+                    print("Exit")
+            elseif response == 2 then
+                moneyKey = getPrintedMoney(false)
+                redstone.setAnalogOutput("back", 15)
                 if moneyKey then
-                local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
-                if resp.success then
-                    monitor.clear()
-                    monitor.setCursorPos(1,2)
-                    monitor.write("Saldo: " .. resp.saldo)
-                    tornareIndietroFunzione(7)
-                else
-                    monitor.clear()
-                    monitor.setCursorPos(1,2)
-                    monitor.write("Banconota non valida")
-                    monitor.setCursorPos(1,3)
-                    monitor.write("Errore" .. resp.error)
-                    tornareIndietroFunzione(7)
-                    end
-                else
-                    monitor.clear()
+                    local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
+                    if resp.success then
+                        monitor.clear()
+                        monitor.setCursorPos(1,2)
+                        monitor.write("Saldo: " .. resp.saldo)
+                        tornareIndietroFunzione(7)
+                    else
+                        monitor.clear()
+                        monitor.setCursorPos(1,2)
+                        monitor.write("Banconota non valida")
+                        monitor.setCursorPos(1,3)
+                        monitor.write("Errore" .. resp.error)
+                        tornareIndietroFunzione(7)
+                        end
+                    else
+                        monitor.clear()
                 end
             end
                 
