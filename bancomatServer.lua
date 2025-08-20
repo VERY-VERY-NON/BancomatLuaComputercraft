@@ -206,12 +206,14 @@ while true do
         local cardKey = msg.cardKey
         local quanti = msg.amount or 0
 
+        response.success = true
         accounts[cardKey].saldo = accounts[cardKey].saldo + quanti
     elseif msg.cmd == "rimuovi crediti" then
         elseif msg.cmd == "aggiungi crediti" then
         local cardKey = msg.cardKey
         local quanti = msg.amount or 0
 
+        response.success = true
         accounts[cardKey].saldo = accounts[cardKey].saldo - quanti
     else
         response.success = false
