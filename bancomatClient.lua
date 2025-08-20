@@ -17,6 +17,7 @@ local function getCreditCard()
     end
     if card.name ~= "minecraft:paper" or card.count ~= 1 or card.nbt == nil then
         redstone.setAnalogOutput("bottom", 0)
+        sleep(0.9)
         return nil
     end
     
@@ -165,6 +166,8 @@ end
 local function getPrintedMoney(checkBarrel)
     while true do
 
+        redstone.setAnalogOutput("bottom", 15)
+
         local money
         
         if checkBarrel then
@@ -173,13 +176,17 @@ local function getPrintedMoney(checkBarrel)
             money = chest.getItemDetail(1)
         end
 
-   
-        if money and money.name == "computercraft:printed_page" and money.nbt then
-            local key = money.nbt
-            return key
+        if money then
+            if money.name == "computercraft:printed_page" and money.nbt then
+                local key = money.nbt
+                return key
+            else
+                redstone.setAnalogOutput("bottom", 0)
+                sleep(0.9)
+            end
         end
 
-        sleep(0.3)
+        sleep(0.2)
     end
 end
 
@@ -255,9 +262,10 @@ redstone.setAnalogOutput("back", 0)
 local cardKey, cardName
 
 repeat
+    redstone.setAnalogOutput("bottom", 15)
     cardKey, cardName = getCreditCard()
     redstone.setAnalogOutput("bottom", 15)
-    sleep(1)
+    sleep(0.3)
 until cardKey
 
 redstone.setAnalogOutput("bottom", 0)
@@ -398,15 +406,15 @@ else
                     
                     -- Write to the page
                     printer.setPageTitle("CreditiSociali")
-                    printer.write("<<Ricevuta Crediti Sociali>>")
+                    printer.write("Ricevuta Crediti Sociali")
                     printer.setCursorPos(1, 3)
                     printer.write("User: ")
                     printer.write(cardKey)
                     
                     printer.setCursorPos(1, 5)
-                    printer.write(resp.moneyCurId)
+                    printer.write("Money id: " .. resp.moneyCurId)
                     printer.setCursorPos(1, 7)
-                    printer.write("Prelievo: ")
+                    printer.write("Crediti Sociali: ")
                     printer.write(q)
     
                     -- And finally print the page!
