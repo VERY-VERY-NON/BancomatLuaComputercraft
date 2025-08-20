@@ -44,7 +44,7 @@ local function creaCartaDiCredito()
     local pin = read()
     
     local loginResponse = sendRequest({cmd="crea carta", cardKey=cardKey, pin = pin})
-    return true
+    return loginResponse
 end
 
 local function rimuoviCartaDiCredito()
@@ -71,17 +71,19 @@ while true do
   local scelta = read()
 
   if scelta == "1" then
-      local success = creaCartaDiCredito()
-      if success then
-          write("Carta creata con successo. \n")
-      else
-          write("Errore carta non create. \n")
+      local response = creaCartaDiCredito()
+      if response == false then
+            write("Errore carta non creata. \n")
+      elseif response.success == false then
+            write("Errore: " .. response.error .. "\n")
+        else if response.success == true then
+            write("Carta creata con successo")
       end
   else
       write("scelta non esistente. \n")
   end
   local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
-  sleep(0.5)
+  sleep(0.1)
 end
   
 
