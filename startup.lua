@@ -1,6 +1,6 @@
 while true do
     local ok, err = pcall(function()
-        shell.run("nomeDelTuoProgramma.lua")
+        shell.run(nomeDelTuoProgramma.lua)
     end)
     if not ok then
         print("Errore: "..tostring(err))
