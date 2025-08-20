@@ -1,17 +1,18 @@
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 local chest = peripheral.find("minecraft:chest") or error("Nessuna chest")
 local printer = peripheral.find("printer") or error("Nessun printer")
+local port = 890
 
-modem.open(890)
+modem.open(port)
 
 local function sendRequest(msg)
-    modem.transmit(1, 2, msg) -- invia al server
+    modem.transmit(1, port, msg) -- invia al server
 
     -- attende messaggio dal server con timeout
     local timer = os.startTimer(5) -- 5 secondi timeout
     while true do
         local event, side, senderChannel, replyChannel, response, senderID = os.pullEvent()
-        if event == "modem_message" and senderChannel == 2 then
+        if event == "modem_message" and senderChannel == port then
             os.cancelTimer(timer)
             return response
         elseif event == "timer" and side == timer then
@@ -22,6 +23,7 @@ end
 
 local function creaCartaDiCredito()
     local item = chest.getItemDetail(1)
+    
     if not item then
          write("Errore carta di credito assente .\n")
         return false
@@ -36,11 +38,13 @@ local function creaCartaDiCredito()
     end
     
     local cardKey = item.nbt
+    
     if not cardKey then
         write("Errore carta di credito non valida.\n")
         return false
     end
     local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
+    
     if loginResponse.success == true then
         write("Carta già esistente.\n")
         return false
@@ -81,13 +85,13 @@ while true do
             write("Errore carta non creata. \n")
       elseif response.success == false then
             write("Errore: " .. response.error .. "\n")
-        else if response.success == true then
+        elseif response.success == true then
             write("Carta creata con successo")
       end
   else
       write("scelta non esistente. \n")
   end
-  local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
+  
   sleep(0.1)
 end
   
