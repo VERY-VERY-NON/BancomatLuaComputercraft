@@ -259,71 +259,70 @@ while true do
     monitor.setCursorPos(1,5)
     monitor.write(" dispenser e premere il pulsante...")
 
-repeat
-    redstone.setAnalogOutput("bottom", 15)
-    cardKey, cardName = getCreditCard()
-    redstone.setAnalogOutput("bottom", 15)
-    sleep(0.3)
-until cardKey
-    redstone.setAnalogOutput("back", 0)
-
-redstone.setAnalogOutput("bottom", 0)
-sleep(0.3)
-    
-redstone.setAnalogOutput("back", 15)
-redstone.setAnalogOutput("bottom", 15)
-    
-monitor.clear()
-monitor.setCursorPos(1,1)
-monitor.write("=== BANCOMAT ===")
-    local cardKey, cardName
-
-local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
-local accountEsiste
-    
-if loginResponse.success == true then
-    accountEsiste = true
-else
-    accountEsiste = false
-end
-    
-local attempt = 1
-repeat 
-    local pin
-    
     repeat
-        pin = getPin(accountEsiste)
-        sleep(0.5)
-    until pin
-        
-    loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
-    
-    if not loginResponse.success then
-        monitor.clear()
-        monitor.setCursorPos(1,1)
-        monitor.write("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
-        attempt = attempt + 1
-        tornareIndietroFunzione(7)
-    end
         redstone.setAnalogOutput("bottom", 15)
         cardKey, cardName = getCreditCard()
         redstone.setAnalogOutput("bottom", 15)
         sleep(0.3)
     until cardKey
+    redstone.setAnalogOutput("back", 0)
+    
+    redstone.setAnalogOutput("bottom", 0)
+    sleep(0.3)
+        
+    redstone.setAnalogOutput("back", 15)
+    redstone.setAnalogOutput("bottom", 15)
+        
+    monitor.clear()
+    monitor.setCursorPos(1,1)
+    monitor.write("=== BANCOMAT ===")
+    local cardKey, cardName
 
-until loginResponse.success or attempt == 4
+    local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
+    local accountEsiste
+        
+    if loginResponse.success == true then
+        accountEsiste = true
+    else
+        accountEsiste = false
+    end
+        
+    local attempt = 1
+    repeat 
+        local pin
+        
+        repeat
+            pin = getPin(accountEsiste)
+            sleep(0.5)
+        until pin
+            
+        loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
+        
+        if not loginResponse.success then
+            monitor.clear()
+            monitor.setCursorPos(1,1)
+            monitor.write("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
+            attempt = attempt + 1
+            tornareIndietroFunzione(7)
+        end
+            redstone.setAnalogOutput("bottom", 15)
+            cardKey, cardName = getCreditCard()
+            redstone.setAnalogOutput("bottom", 15)
+            sleep(0.3)    
+    until loginResponse.success or attempt == 4
+    
     redstone.setAnalogOutput("bottom", 0)
     sleep(0.3)
     redstone.setAnalogOutput("back", 15)
     redstone.setAnalogOutput("bottom", 15)
-
-if attempt == 4 then
-    monitor.clear()
-    monitor.setCursorPos(1,1)
-    monitor.write("Troppi tentativi effettuati")
-    tornareIndietroFunzione(7)
-else
-    print("Login effettuato! Saldo: " .. loginResponse.saldo)
+    
+    if attempt == 4 then
+        monitor.clear()
+        monitor.setCursorPos(1,1)
+        monitor.write("Troppi tentativi effettuati")
+        tornareIndietroFunzione(7)
+    else
+        print("Login effettuato! Saldo: " .. loginResponse.saldo)
 
     -- Loop principale
     while true do
@@ -560,3 +559,4 @@ end
 monitor.clear()
 monitor.setCursorPos(1,1)
 monitor.write("Grazie!")
+        
