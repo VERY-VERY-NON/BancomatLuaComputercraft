@@ -202,6 +202,17 @@ while true do
             response.error = "Tentativo truffaldino! Se credi sia un errore, fai uno screen e contattalo alle autorità"
             response.saldo = accounts[cardKey].saldo
         end
+    elseif msg.cmd == "aggiungi crediti" then
+        local cardKey = msg.cardKey
+        local quanti = msg.amount or 0
+
+        accounts[cardKey].saldo = accounts[cardKey].saldo + quanti
+    elseif msg.cmd == "rimuovi crediti" then
+        elseif msg.cmd == "aggiungi crediti" then
+        local cardKey = msg.cardKey
+        local quanti = msg.amount or 0
+
+        accounts[cardKey].saldo = accounts[cardKey].saldo - quanti
     else
         response.success = false
         response.error = "Comando sconosciuto"
