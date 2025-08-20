@@ -139,6 +139,7 @@ while true do
             response.success = false
             response.error = "Pin errato"
         end
+        response.success = true
         accounts[cardKey] = nil
 
     elseif msg.cmd == "esiste account" then
