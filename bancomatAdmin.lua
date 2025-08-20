@@ -141,7 +141,7 @@ end
 
 local function stampaCreditiSocialiValidi()
 
-    write("Inserire quanti crediti associare alla carta.\n")
+    write("Inserire quanti crediti associare alla carta da stampare.\n")
     local q = read()
     
     if not printer.newPage() then
@@ -154,7 +154,7 @@ local function stampaCreditiSocialiValidi()
     printer.write("Ricevuta Crediti Sociali")
     printer.setCursorPos(1, 3)
     printer.write("User: ")
-    printer.write(cardKey)
+    printer.write("Frocio Social Bank")
     
     printer.setCursorPos(1, 5)
     printer.write("Money id: " .. loginResponse.moneyCurId)
@@ -167,7 +167,10 @@ local function stampaCreditiSocialiValidi()
         write("Cannot end page \n")
         return nil
     end
+    write("Scrivere qualsiasi cosa quando hai inserito i soldi nella chest")
+    repeat 
 
+    until read()
     local moneyKey = getMoneyPrinted()
 
     if not moneyKey then
@@ -227,7 +230,7 @@ while true do
     elseif scelta == "5" then
         stampaCreditiSocialiValidi()
     elseif scelta == "6" then
-        rimuoviCreditiSociali()
+        rimuoviCreditiSocialiStampatiValidi()
     else
         write("scelta non esistente. \n")
     end
