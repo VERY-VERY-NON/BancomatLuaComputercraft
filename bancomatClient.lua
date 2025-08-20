@@ -164,14 +164,21 @@ end
 
 local function getPrintedMoney()
     while true do
+
         local money = barrel.getItemDetail(1)
+
+        
 
         if money and money.name == "computercraft:printed_page" and money.count == 1 and money.nbt then
             local key = money.nbt
             return key, nil
+        else
+            redstone.setAnalogOutput("bottom", 0)
+            sleep(0.3)
+            redstone.setAnalogOutput("bottom", 15)
         end
 
-        sleep(0.3)
+        sleep(0.1)
     end
 end
 
@@ -336,7 +343,10 @@ else
             monitor.setCursorPos(1,7)
             monitor.write("per andare indietro")
             
+            redstone.setAnalogOutput("back", 0)
             moneyKey, x = parallel.waitForAny(ascoltaMonitor, getPrintedMoney)
+            redstone.setAnalogOutput("back", 15)
+
             if x then break end
                 
             if moneyKey then
