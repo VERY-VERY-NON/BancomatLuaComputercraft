@@ -131,17 +131,16 @@ while true do
         local cardKey = msg.cardKey
         local pin = msg.pin
 
-        if !accounts[cardKey] then
+        if not accounts[cardKey] then
             response.success = false
             response.error = "Carta non esistente"
         end
-        if accounts[cardKey].pin == pin then
-            accounts[cardKey] = nil
-        else
+        if not accounts[cardKey].pin == pin then
             response.success = false
             response.error = "Pin errato"
         end
-        
+        accounts[cardKey] = nil
+
     elseif msg.cmd == "esiste account" then
             local cardKey = msg.cardKey
             if accounts[cardKey] then
