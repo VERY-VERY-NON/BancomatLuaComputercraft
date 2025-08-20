@@ -141,7 +141,7 @@ while true do
         end
         response.success = true
         accounts[cardKey] = nil
-
+        salva()
     elseif msg.cmd == "esiste account" then
             local cardKey = msg.cardKey
             if accounts[cardKey] then
@@ -217,6 +217,20 @@ while true do
             accounts[cardKey].saldo = 0
         end
         response.saldo = accounts[cardKey].saldo
+    elseif msg.cmd == "registra soldi admin" then
+        local moneyKey = msg.moneyKey 
+        local amount = msg.amount
+        money[moneyKey] = {quanti = amount}
+        salvaMoney()
+        
+        response.moneyCurId = moneyCurId
+        moneyCurId = moneyCurId + 1
+    elseif msg.cmd == "elmina soldi" then
+            local moneyKey = msg.moneyKey 
+            money[moneyKey] = nil
+            salvaMoney()
+    elseif msg.cmd == "getMoneyId" then
+        response.moneyCurId = moneyCurId
     else
         response.success = false
         response.error = "Comando sconosciuto"
