@@ -37,6 +37,57 @@ local function salvaMoney()
     moneyFile.close()
 end
 
+-- converte lettere in numeri (A=10, B=11, ..., Z=35)
+local function letterToNumber(c)
+    return tostring(string.byte(c) - 55)  -- 'A'=65 → 10
+end
+
+-- calcola IBAN con mod97
+local function generaIBAN()
+    local country = "MC"  -- finto paese "Minecraft"
+    local check = "00"    -- provvisorio
+    local bankCode = "0001" -- banca fissa
+    local conto = ""
+    for i = 1, 12 do
+        conto = conto .. tostring(math.random(0,9)) -- numero conto random
+    end
+
+    -- IBAN temporaneo senza check reali
+    local iban = country .. check .. bankCode .. conto
+
+    -- prepara stringa per mod97: sposta country+check alla fine
+    local rearranged = bankCode .. conto .. country .. check
+
+    -- sostituisci lettere con numeri
+    local numeric = ""
+    for c in rearranged:gmatch(".") do
+        if c:match("%a") then
+            numeric = numeric .. letterToNumber(c)
+        else
+            numeric = numeric .. c
+        end
+    end
+
+    -- calcolo mod97
+    local remainder = tonumber(numeric:sub(1,9)) % 97
+    local pos = 10
+    while pos <= #numeric do
+        local chunk = tostring(remainder) .. numeric:sub(pos, pos+6)
+        remainder = tonumber(chunk) % 97
+        pos = pos + 7
+    end
+
+    local checkDigits = 98 - remainder
+    if checkDigits < 10 then
+        checkDigits = "0"..checkDigits
+    else
+        checkDigits = tostring(checkDigits)
+    end
+
+    -- IBAN finale con check corretti
+    return country .. checkDigits .. bankCode .. conto
+end
+
 -- Ender Modem
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(modemPort) -- canale server
@@ -66,7 +117,13 @@ while true do
                 response.error = "Pin errato"
             end
         else
-            accounts[cardKey] = {saldo = 0, pin = pin}
+            response.success = false
+            response.error = "Carta non registrata"
+        end
+    elseif msg.cmd == "crea carta" then
+            local cardKey = msg.cardKey
+            local pin = msg.pin
+            accounts[cardKey] = {saldo = 0, pin = pin, IBAN = generaIBAN()}
             salva()
             response.success = true
             response.saldo = 0
@@ -126,6 +183,8 @@ while true do
                 salvaMoney()
                 response.success = true
                 response.saldo = accounts[cardKey].saldo
+    elseif msg.cmd == "data" then
+            return accounts, money
         else
             response.success = false
             response.error = "Tentativo truffaldino! Se credi sia un errore, fai uno screen e contattalo alle autorità"
