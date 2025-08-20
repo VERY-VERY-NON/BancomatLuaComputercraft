@@ -279,7 +279,9 @@ while true do
     local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
         
     if loginResponse.success == false then
-        monitor.write("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
+        monitor.clear()
+        monitor.setCursorPos(1,1)
+        monitor.write("Carta non registrata")
         tornareIndietroFunzione(7)
         goto continue
     end
