@@ -224,6 +224,10 @@ while true do
             aggiungiCreditiSociali()
     elseif scelta == "4" then
             rimuoviCreditiSociali()
+    elseif scelta == "5" then
+        stampaCreditiSocialiValidi()
+    elseif scelta == "6" then
+        rimuoviCreditiSociali()
     else
         write("scelta non esistente. \n")
     end
