@@ -129,16 +129,14 @@ local function getPrelievo()
     return q
 end
 
-local function getPin(accountEsiste)
+local function getPin()
     local tasto
     local pin = ""
     local hiddenPin = ""
     local offset = 2
-    if accountEsiste then
-        numPad(offset,offset,"pin")
-    else
-        numPad(offset,offset,"pin nuovo")
-    end
+    
+    numPad(offset,offset,"pin")
+   
     repeat
         tasto = getNumPadPress(offset, offset)
         print(tasto)
@@ -246,237 +244,237 @@ local function sendRequest(msg)
     end
 end
 
-
--- Login
-monitor.clear()
-monitor.setCursorPos(1,1)
-monitor.write("=== BANCOMAT ===")
-monitor.setCursorPos(1,3)
-monitor.write("Inserire carta di credito nel")
-monitor.setCursorPos(1,5)
-monitor.write(" dispenser e premere il pulsante...")
-
-redstone.setAnalogOutput("bottom", 15)
-redstone.setAnalogOutput("back", 0)
-
-local cardKey, cardName
-
-repeat
-    redstone.setAnalogOutput("bottom", 15)
-    cardKey, cardName = getCreditCard()
-    redstone.setAnalogOutput("bottom", 15)
-    sleep(0.3)
-until cardKey
-
-redstone.setAnalogOutput("bottom", 0)
-sleep(0.3)
-    
-redstone.setAnalogOutput("back", 15)
-redstone.setAnalogOutput("bottom", 15)
-    
-monitor.clear()
-monitor.setCursorPos(1,1)
-monitor.write("=== BANCOMAT ===")
-
-local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
-local accountEsiste
-    
-if loginResponse.success == true then
-    accountEsiste = true
-else
-    accountEsiste = false
-end
-    
-local attempt = 1
-repeat 
-    local pin
-    
-    repeat
-        pin = getPin(accountEsiste)
-        sleep(0.5)
-    until pin
-        
-    loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
-    
-    if not loginResponse.success then
-        monitor.clear()
-        monitor.setCursorPos(1,1)
-        monitor.write("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
-        attempt = attempt + 1
-        tornareIndietroFunzione(7)
-    end
-
-until loginResponse.success or attempt == 4
-
-if attempt == 4 then
+while true do
+    -- Login
     monitor.clear()
     monitor.setCursorPos(1,1)
-    monitor.write("Troppi tentativi effettuati")
-    tornareIndietroFunzione(7)
-else
-    print("Login effettuato! Saldo: " .. loginResponse.saldo)
-
-    -- Loop principale
-    while true do
-        redstone.setAnalogOutput("bottom", 0)
-        redstone.setAnalogOutput("back", 0)
-
-        scriviSceltaMonitor()
-        
-        local scelta
-        local event, side, x, y
-        repeat 
-            event, side, x, y = os.pullEvent("monitor_touch")
-            sleep(0.2)
-        until y
+    monitor.write("=== BANCOMAT ===")
+    monitor.setCursorPos(1,3)
+    monitor.write("Inserire carta di credito nel")
+    monitor.setCursorPos(1,5)
+    monitor.write(" dispenser e premere il pulsante...")
     
-        scelta = math.ceil(y / 2)
-        scelta = math.max(1, math.min(4, scelta)) 
+    redstone.setAnalogOutput("bottom", 15)
+    redstone.setAnalogOutput("back", 0)
+    
+    local cardKey, cardName
+    
+    repeat
+        redstone.setAnalogOutput("bottom", 15)
+        cardKey, cardName = getCreditCard()
+        redstone.setAnalogOutput("bottom", 15)
+        sleep(0.3)
+    until cardKey
+    
+    redstone.setAnalogOutput("bottom", 0)
+    sleep(0.3)
         
-        if scelta == 1 then
-            local resp = sendRequest({cmd="saldo", cardKey=cardKey})
-            print("Saldo: " .. resp.saldo)
+    redstone.setAnalogOutput("back", 15)
+    redstone.setAnalogOutput("bottom", 15)
+        
+    monitor.clear()
+    monitor.setCursorPos(1,1)
+    monitor.write("=== BANCOMAT ===")
+    
+    local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
+        
+    if loginResponse.success == false then
+        monitor.write("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
+        tornareIndietroFunzione(7)
+        goto continue
+    end
+        
+    local attempt = 1
+    repeat 
+        local pin
+        
+        repeat
+            pin = getPin(accountEsiste)
+            sleep(0.5)
+        until pin
+            
+        loginResponse = sendRequest({cmd="login", cardKey=cardKey, pin=pin})
+        
+        if not loginResponse.success then
             monitor.clear()
             monitor.setCursorPos(1,1)
-            monitor.write("Saldo: " .. resp.saldo)
+            monitor.write("Errore: " .. (loginResponse.error or "Errore sconosciuto"))
+            attempt = attempt + 1
             tornareIndietroFunzione(7)
+        end
     
-        elseif scelta == 2 then
-            redstone.setAnalogOutput("bottom", 15)
-            monitor.clear()
-            monitor.setCursorPos(1,1)
-            monitor.write("Inserire i soldi da depositare nel")
-            monitor.setCursorPos(1,3)
-            monitor.write(" dispenser e premere il pulsante.")
-            monitor.setCursorPos(1,5)
-            monitor.write("Premere sullo schermo ")
-            monitor.setCursorPos(1,7)
-            monitor.write("per andare indietro")
-            
+    until loginResponse.success or attempt == 4
+    
+    if attempt == 4 then
+        monitor.clear()
+        monitor.setCursorPos(1,1)
+        monitor.write("Troppi tentativi effettuati")
+        tornareIndietroFunzione(7)
+    else
+        print("Login effettuato! Saldo: " .. loginResponse.saldo)
+    
+        -- Loop principale
+        while true do
+            redstone.setAnalogOutput("bottom", 0)
             redstone.setAnalogOutput("back", 0)
-            response = parallel.waitForAny(
-                ascoltaMonitor,
-                function() return getPrintedMoney(false) end
-            )
+    
+            scriviSceltaMonitor()
             
-            if response == 1 then
-                    print("Exit")
-            elseif response == 2 then
-                moneyKey = getPrintedMoney(false)
+            local scelta
+            local event, side, x, y
+            repeat 
+                event, side, x, y = os.pullEvent("monitor_touch")
+                sleep(0.2)
+            until y
+        
+            scelta = math.ceil(y / 2)
+            scelta = math.max(1, math.min(4, scelta)) 
+            
+            if scelta == 1 then
+                local resp = sendRequest({cmd="saldo", cardKey=cardKey})
+                print("Saldo: " .. resp.saldo)
+                monitor.clear()
+                monitor.setCursorPos(1,1)
+                monitor.write("Saldo: " .. resp.saldo)
+                tornareIndietroFunzione(7)
+        
+            elseif scelta == 2 then
+                redstone.setAnalogOutput("bottom", 15)
+                monitor.clear()
+                monitor.setCursorPos(1,1)
+                monitor.write("Inserire i soldi da depositare nel")
+                monitor.setCursorPos(1,3)
+                monitor.write(" dispenser e premere il pulsante.")
+                monitor.setCursorPos(1,5)
+                monitor.write("Premere sullo schermo ")
+                monitor.setCursorPos(1,7)
+                monitor.write("per andare indietro")
+                
+                redstone.setAnalogOutput("back", 0)
+                response = parallel.waitForAny(
+                    ascoltaMonitor,
+                    function() return getPrintedMoney(false) end
+                )
+                
+                if response == 1 then
+                        print("Exit")
+                elseif response == 2 then
+                    moneyKey = getPrintedMoney(false)
+                    redstone.setAnalogOutput("back", 15)
+                    if moneyKey then
+                        local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
+                        if resp.success then
+                            monitor.clear()
+                            monitor.setCursorPos(1,2)
+                            monitor.write("Saldo: " .. resp.saldo)
+                            tornareIndietroFunzione(7)
+                        else
+                            monitor.clear()
+                            monitor.setCursorPos(1,2)
+                            monitor.write("Banconota non valida")
+                            monitor.setCursorPos(1,3)
+                            monitor.write("Errore" .. resp.error)
+                            tornareIndietroFunzione(7)
+                            end
+                        else
+                            monitor.clear()
+                    end
+                end
+                    
+               
+            elseif scelta == 3 then
                 redstone.setAnalogOutput("back", 15)
-                if moneyKey then
-                    local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
+                write("Quantità da prelevare: ")
+                local q 
+                
+                repeat
+                    q = getPrelievo()
+                    sleep(0.5)
+                until q
+                q = tonumber(q)
+                if q and q > 0 then
+                    local resp = sendRequest({cmd="preleva", cardKey=cardKey, amount=q})
                     if resp.success then
-                        monitor.clear()
-                        monitor.setCursorPos(1,2)
-                        monitor.write("Saldo: " .. resp.saldo)
-                        tornareIndietroFunzione(7)
-                    else
-                        monitor.clear()
-                        monitor.setCursorPos(1,2)
-                        monitor.write("Banconota non valida")
-                        monitor.setCursorPos(1,3)
-                        monitor.write("Errore" .. resp.error)
-                        tornareIndietroFunzione(7)
+                        print("Prelievo effettuato! Saldo: " .. resp.saldo)
+                        -- Start a new page, or print an error.
+                        if not printer.newPage() then
+                          error("Cannot start a new page. Do you have ink and paper?")
+                        end
+                        
+                        -- Write to the page
+                        printer.setPageTitle("CreditiSociali")
+                        printer.write("Ricevuta Crediti Sociali")
+                        printer.setCursorPos(1, 3)
+                        printer.write("User: ")
+                        printer.write(cardKey)
+                        
+                        printer.setCursorPos(1, 5)
+                        printer.write("Money id: " .. resp.moneyCurId)
+                        printer.setCursorPos(1, 7)
+                        printer.write("Crediti Sociali: ")
+                        printer.write(q)
+        
+                        -- And finally print the page!
+                        if not printer.endPage() then
+                            monitor.clear()
+                            monitor.setCursorPos(1,1)
+                            monitor.write("Impossibile stampare la banconota")
+                            monitor.setCursorPos(1,3)
+                            monitor.write("Contattare le autorità per aiuto")
+                            tornareIndietroFunzione(7)
+                            return nil
+                        end
+    
+                        local moneyKey
+                        
+                        repeat
+                            moneyKey = getPrintedMoney(true)
+                            sleep(0.5)
+                        until moneyKey
+    
+                        redstone.setAnalogOutput("bottom", 0)
+                        sleep(0.3)
+                        redstone.setAnalogOutput("bottom", 15)
+                        
+                        local resp = sendRequest({cmd="registra soldi",cardKey=cardKey, moneyKey=moneyKey, amount=q})
+        
+                        if resp.success then
+                            monitor.clear()
+                            monitor.setCursorPos(1,1)
+                            monitor.write("Banconota registrati con sucesso")
+                            redstone.setAnalogOutput("bottom", 0)
+                            sleep(0.2)
+                            redstone.setAnalogOutput("bottom", 15)
+                            tornareIndietroFunzione(7)
+                        else
+                            monitor.clear()
+                            monitor.setCursorPos(1,1)
+                            monitor.write("Banconota non registrata")
+                            monitor.setCursorPos(1,3)
+                            monitor.write("Contattare le autorità per aiuto")
+                            tornareIndietroFunzione(7)
                         end
                     else
                         monitor.clear()
+                        monitor.setCursorPos(1,1)
+                        monitor.write(resp.error)
+                        tornareIndietroFunzione(7)
+                    end
                 end
+        
+            elseif scelta == 4 then
+                break
+            else
+                monitor.clear()
+                monitor.setCursorPos(1,1)
+                monitor.write("Scelta non valida")
+                tornareIndietroFunzione(7)
             end
-                
-           
-        elseif scelta == 3 then
-            redstone.setAnalogOutput("back", 15)
-            write("Quantità da prelevare: ")
-            local q 
-            
-            repeat
-                q = getPrelievo()
-                sleep(0.5)
-            until q
-            q = tonumber(q)
-            if q and q > 0 then
-                local resp = sendRequest({cmd="preleva", cardKey=cardKey, amount=q})
-                if resp.success then
-                    print("Prelievo effettuato! Saldo: " .. resp.saldo)
-                    -- Start a new page, or print an error.
-                    if not printer.newPage() then
-                      error("Cannot start a new page. Do you have ink and paper?")
-                    end
-                    
-                    -- Write to the page
-                    printer.setPageTitle("CreditiSociali")
-                    printer.write("Ricevuta Crediti Sociali")
-                    printer.setCursorPos(1, 3)
-                    printer.write("User: ")
-                    printer.write(cardKey)
-                    
-                    printer.setCursorPos(1, 5)
-                    printer.write("Money id: " .. resp.moneyCurId)
-                    printer.setCursorPos(1, 7)
-                    printer.write("Crediti Sociali: ")
-                    printer.write(q)
-    
-                    -- And finally print the page!
-                    if not printer.endPage() then
-                        monitor.clear()
-                        monitor.setCursorPos(1,1)
-                        monitor.write("Impossibile stampare la banconota")
-                        monitor.setCursorPos(1,3)
-                        monitor.write("Contattare le autorità per aiuto")
-                        tornareIndietroFunzione(7)
-                        return nil
-                    end
-
-                    local moneyKey
-                    
-                    repeat
-                        moneyKey = getPrintedMoney(true)
-                        sleep(0.5)
-                    until moneyKey
-
-                    redstone.setAnalogOutput("bottom", 0)
-                    sleep(0.3)
-                    redstone.setAnalogOutput("bottom", 15)
-                    
-                    local resp = sendRequest({cmd="registra soldi",cardKey=cardKey, moneyKey=moneyKey, amount=q})
-    
-                    if resp.success then
-                        monitor.clear()
-                        monitor.setCursorPos(1,1)
-                        monitor.write("Banconota registrati con sucesso")
-                        redstone.setAnalogOutput("bottom", 0)
-                        sleep(0.2)
-                        redstone.setAnalogOutput("bottom", 15)
-                        tornareIndietroFunzione(7)
-                    else
-                        monitor.clear()
-                        monitor.setCursorPos(1,1)
-                        monitor.write("Banconota non registrata")
-                        monitor.setCursorPos(1,3)
-                        monitor.write("Contattare le autorità per aiuto")
-                        tornareIndietroFunzione(7)
-                    end
-                else
-                    monitor.clear()
-                    monitor.setCursorPos(1,1)
-                    monitor.write(resp.error)
-                    tornareIndietroFunzione(7)
-                end
-            end
-    
-        elseif scelta == 4 then
-            break
-        else
-            monitor.clear()
-            monitor.setCursorPos(1,1)
-            monitor.write("Scelta non valida")
-            tornareIndietroFunzione(7)
         end
+    
     end
-
+    
+    :: continue ::
+    
+    
 end
-
-monitor.clear()
-monitor.setCursorPos(1,1)
-monitor.write("Grazie!")
