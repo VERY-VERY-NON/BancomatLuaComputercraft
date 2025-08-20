@@ -159,15 +159,29 @@ local function getPin(accountEsiste)
 end
 
 local function getPrintedMoney()
-    local money = chest.getItemDetail(1)
-    if not money then return nil end
-    if money.name ~= "computercraft:printed_page" then return nil end
-    if money.count ~= 1 then return nil end
-    if money.nbt == nil then return nil end
-    
-    local key = money.nbt
-    return key
+    while true do
+        sleep(0.1)
+        local money = chest.getItemDetail(1)
+        if not money then return nil end
+        if money.name ~= "computercraft:printed_page" then return nil end
+        if money.count ~= 1 then return nil end
+        if money.nbt == nil then return nil end
+        
+        local key = money.nbt
+        return key, nil
+    end
 end
+
+local function ascoltaMonitor()
+    while true do
+        local event, side, x, y = os.pullEvent("monitor_touch")
+        sleep(0.2)
+
+        return nil, x
+        
+    end
+end
+
 
 local function scriviSceltaMonitor()
     
@@ -317,14 +331,9 @@ else
             monitor.write("Premere sullo schermo ")
             monitor.setCursorPos(1,7)
             monitor.write("per andare indietro")
-            local event, side, x, y
-            repeat
-                event, side, x, y = os.pullEvent("monitor_touch")
-                moneyKey = getPrintedMoney()
-                sleep(0.2)
-            until moneyKey or x
-
-            if x then return nil end
+            
+            moneyKey, x = parallel.waitForAny(ascoltaMonitor, controllaChest)
+            if x then break end
                 
             if moneyKey then
                 local resp = sendRequest({cmd="deposita", moneyKey=moneyKey, cardKey=cardKey, amount=q})
@@ -387,7 +396,7 @@ else
                     end
     
                     redstone.setAnalogOutput("bottom", 0)
-                    sleep(0.2)
+                    sleep(0.3)
                     redstone.setAnalogOutput("bottom", 15)
 
                     local moneyKey
