@@ -21,8 +21,8 @@ local function sendRequest(msg)
     end
 end
 
-local function creaCartaDiCredito()
-    local item = chest.getItemDetail(1)
+local function getCarta()
+     local item = chest.getItemDetail(1)
     
     if not item then
          write("Errore carta di credito assente .\n")
@@ -39,10 +39,17 @@ local function creaCartaDiCredito()
     
     local cardKey = item.nbt
     
+    return cardKey
+end
+
+local function creaCartaDiCredito()
+
+    local cardKey = getCarta()
     if not cardKey then
         write("Errore carta di credito non valida.\n")
         return false
     end
+    
     local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
     
     if loginResponse.success == true then
@@ -57,27 +64,12 @@ local function creaCartaDiCredito()
 end
 
 local function rimuoviCartaDiCredito()
-    local item = chest.getItemDetail(1)
-    
-    if not item then
-         write("Errore carta di credito assente .\n")
-        return false
-    end
-    if not item.name == "minecraft:paper" then
-          write("Errore carta di credito non è un pezzo di carta .\n")
-          return false
-    end
-    if not item.count == 1 then
-        write("Errore il numero di carte di credito è maggiore di 1.\n")
-        return false
-    end
-    
-    local cardKey = item.nbt
-    
+    local cardKey = getCarta()
     if not cardKey then
         write("Errore carta di credito non valida.\n")
         return false
     end
+    
     local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
     
     if loginResponse.success == false then
@@ -92,11 +84,38 @@ local function rimuoviCartaDiCredito()
 end
 
 local function aggiungiCreditiSociali()
+    local cardKey = getCarta()
+    if not cardKey then
+        write("Errore carta di credito non valida.\n")
+        return false
+    end
+
+    write("Scrivere quantità da aggiungere. \n")
+    local q = read()
+    local loginResponse = sendRequest({cmd="aggiungi crediti", cardKey=cardKey, quanti=q})
+
+    if loginResponse then
+        write("Crediti aggiunti con successo.\n")
+        write("Saldo: " .. loginResponse.saldo)
+    end
 
 end
 
 local function rimuoviCreditiSociali()
+    local cardKey = getCarta()
+    if not cardKey then
+        write("Errore carta di credito non valida.\n")
+        return false
+    end
 
+    write("Scrivere quantità da aggiungere. \n")
+    local q = read()
+    local loginResponse = sendRequest({cmd="aggiungi crediti", cardKey=cardKey, quanti=q})
+
+    if loginResponse then
+        write("Crediti aggiunti con successo.\n")
+        write("Saldo: " .. loginResponse.saldo)
+    end
 end
 
 while true do
