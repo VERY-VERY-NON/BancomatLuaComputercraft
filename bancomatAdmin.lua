@@ -42,6 +42,27 @@ local function getCarta()
     return cardKey
 end
 
+local function getMoneyPrinted()
+     local item = chest.getItemDetail(1)
+    
+    if not item then
+         write("Errore crediti stampati assente .\n")
+        return false
+    end
+    if not item.name == "computercraft:printed_page" then
+          write("Errore crediti stampati non è un printed paper .\n")
+          return false
+    end
+    if not item.count == 1 then
+        write("Errore il numero di crediti stampati è maggiore di 1.\n")
+        return false
+    end
+    
+    local moneyKey = item.nbt
+    
+    return moneyKey
+end
+
 local function creaCartaDiCredito()
 
     local cardKey = getCarta()
@@ -116,6 +137,58 @@ local function rimuoviCreditiSociali()
         write("Crediti rimossi con successo.\n")
         write("Saldo: " .. loginResponse.saldo .. "\n")
     end
+end
+
+local function stampaCreditiSocialiValidi()
+
+    write("Inserire quanti crediti associare alla carta.\n")
+    local q = read()
+    
+    if not printer.newPage() then
+      write("Cannot start a new page. Do you have ink and paper? \n")
+        return nil
+    end
+    local loginResponse = sendRequest({cmd="getMoneyId"})
+    -- Write to the page
+    printer.setPageTitle("CreditiSociali")
+    printer.write("Ricevuta Crediti Sociali")
+    printer.setCursorPos(1, 3)
+    printer.write("User: ")
+    printer.write(cardKey)
+    
+    printer.setCursorPos(1, 5)
+    printer.write("Money id: " .. loginResponse.moneyCurId)
+    printer.setCursorPos(1, 7)
+    printer.write("Crediti Sociali: ")
+    printer.write(q)
+
+    -- And finally print the page!
+    if not printer.endPage() then
+        write("Cannot end page \n")
+        return nil
+    end
+
+    local moneyKey = getMoneyPrinted()
+
+    if not moneyKey then
+        write("Errore crediti stampati non validi.\n")
+        return nil
+    end
+    
+
+    local loginResponse = sendRequest({cmd="registra soldi admin", moneyKey=moneyKey, amount=q})
+end
+
+local function rimuoviCreditiSocialiStampatiValidi()
+     local moneyKey = getMoneyPrinted()
+
+    if not moneyKey then
+        write("Errore crediti stampati non validi.\n")
+        return nil
+    end
+    
+
+    local loginResponse = sendRequest({cmd="elmina soldi", moneyKey=moneyKey})
 end
 
 while true do
