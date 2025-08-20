@@ -162,13 +162,15 @@ local function getPrintedMoney()
     while true do
         sleep(0.1)
         local money = chest.getItemDetail(1)
-        if not money then return nil end
-        if money.name ~= "computercraft:printed_page" then return nil end
-        if money.count ~= 1 then return nil end
-        if money.nbt == nil then return nil end
+        if not money then goto continue end
+        if money.name ~= "computercraft:printed_page" then goto continue end
+        if money.count ~= 1 then goto continue end
+        if money.nbt == nil then goto continue end
         
         local key = money.nbt
         return key, nil
+        ::continue::
+        sleep(0.3)
     end
 end
 
@@ -332,7 +334,7 @@ else
             monitor.setCursorPos(1,7)
             monitor.write("per andare indietro")
             
-            moneyKey, x = parallel.waitForAny(ascoltaMonitor, controllaChest)
+            moneyKey, x = parallel.waitForAny(ascoltaMonitor, getPrintedMoney)
             if x then break end
                 
             if moneyKey then
