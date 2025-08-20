@@ -1,6 +1,7 @@
 local monitor = peripheral.find("monitor") or error("Nessun monitor")
 local printer = peripheral.find("printer") or error("Nessun printer")
 local chest = peripheral.find("minecraft:chest") or error("Nessuna chest")
+local barrel = peripheral.find("minecraft:barrel") or error("Nessun barrel")
 local modem = peripheral.find("modem") or error("Nessun Ender Modem")
 modem.open(2) -- canale client
 
@@ -22,7 +23,10 @@ local function getCreditCard()
     local key = card.nbt
     local name = card.displayName
 
-    -- qui non serve controllare se è numero, può essere qualsiasi stringa
+    redstone.setAnalogOutput("bottom", 0)
+    sleep(0.5)
+    redstone.setAnalogOutput("bottom", 15)
+
     return key, name
 end
 
@@ -160,7 +164,7 @@ end
 
 local function getPrintedMoney()
     while true do
-        local money = chest.getItemDetail(1)
+        local money = barrel.getItemDetail(1)
 
         if money and money.name == "computercraft:printed_page" and money.count == 1 and money.nbt then
             local key = money.nbt
@@ -394,10 +398,6 @@ else
                         tornareIndietroFunzione(7)
                         return nil
                     end
-    
-                    redstone.setAnalogOutput("bottom", 0)
-                    sleep(0.3)
-                    redstone.setAnalogOutput("bottom", 15)
 
                     local moneyKey
                     
@@ -405,6 +405,11 @@ else
                         moneyKey = getPrintedMoney()
                         sleep(0.5)
                     until moneyKey
+
+                    redstone.setAnalogOutput("bottom", 0)
+                    sleep(0.3)
+                    redstone.setAnalogOutput("bottom", 15)
+                    
                     local resp = sendRequest({cmd="registra soldi",cardKey=cardKey, moneyKey=moneyKey, amount=q})
     
                     if resp.success then
