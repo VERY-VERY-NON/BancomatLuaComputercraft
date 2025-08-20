@@ -160,19 +160,17 @@ end
 
 local function getPrintedMoney()
     while true do
-        sleep(0.1)
         local money = chest.getItemDetail(1)
-        if not money then goto continue end
-        if money.name ~= "computercraft:printed_page" then goto continue end
-        if money.count ~= 1 then goto continue end
-        if money.nbt == nil then goto continue end
-        
-        local key = money.nbt
-        return key, nil
-        ::continue::
+
+        if money and money.name == "computercraft:printed_page" and money.count == 1 and money.nbt then
+            local key = money.nbt
+            return key, nil
+        end
+
         sleep(0.3)
     end
 end
+
 
 local function ascoltaMonitor()
     while true do
