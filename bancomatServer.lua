@@ -127,7 +127,21 @@ while true do
             salva()
             response.success = true
             response.saldo = 0
+    elseif msg.cmd == "distruggi carta" then
+        local cardKey = msg.cardKey
+        local pin = msg.pin
+
+        if !accounts[cardKey] then
+            response.success = false
+            response.error = "Carta non esistente"
         end
+        if accounts[cardKey].pin == pin then
+            accounts[cardKey] = nil
+        else
+            response.success = false
+            response.error = "Pin errato"
+        end
+        
     elseif msg.cmd == "esiste account" then
             local cardKey = msg.cardKey
             if accounts[cardKey] then
@@ -183,8 +197,6 @@ while true do
                 salvaMoney()
                 response.success = true
                 response.saldo = accounts[cardKey].saldo
-    elseif msg.cmd == "data" then
-            return accounts, money
         else
             response.success = false
             response.error = "Tentativo truffaldino! Se credi sia un errore, fai uno screen e contattalo alle autorità"
