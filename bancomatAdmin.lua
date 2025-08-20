@@ -21,12 +21,26 @@ local function sendRequest(msg)
 end
 
 local function creaCartaDiCredito()
-    local cardKey = chest.getItemDetail(1).nbt
-
-    if not cardKey then
-        write("Errore carta di credito assente o invalida./n")
+    local item = chest.getItemDetail(1)
+    if not item then
+         write("Errore carta di credito assente .\n")
         return false
-    write("Scrivere il pin della carta. /n")
+    end
+    if not item.name == "minecraft:paper" then
+          write("Errore carta di credito non è un pezzo di carta .\n")
+          return false
+    end
+    if not item.count == 1 then
+        write("Errore il numero di carte di credito è maggiore di 1.\n")
+        return false
+    end
+    
+    local cardKey = item.nbt
+    if not cardKey then
+        write("Errore carta di credito non valida.\n")
+        return false
+    end
+    write("Scrivere il pin della carta.\n")
     local pin = read()
     
     local loginResponse = sendRequest({cmd="crea carta", cardKey=cardKey, pin = pin})
@@ -46,25 +60,25 @@ local function rimuoviCreditiSociali()
 end
 
 while true do
-  write("Scrivere la propria scleta./n")
-  write("1) Crea nuova carta di credito. /n")
-  write("2) Rimuovi carta di credito. /n")
-  write("3) Aggiungi crediti sociali ad un conto. /n")
-  write("4) Rimuovi crediti sociali ad un conto. /n")
-  write("5) Stampa nuovi crediti sociali validi. /n")
-  write("6) Rimuovi crediti sociali stampati. /n")
+  write("Scrivere la propria scleta.\n")
+  write("1) Crea nuova carta di credito. \n")
+  write("2) Rimuovi carta di credito. \n")
+  write("3) Aggiungi crediti sociali ad un conto. \n")
+  write("4) Rimuovi crediti sociali ad un conto. \n")
+  write("5) Stampa nuovi crediti sociali validi. \n")
+  write("6) Rimuovi crediti sociali stampati. \n")
   
   local scelta = read()
 
   if scelta == "1" then
       local success = creaCartaDiCredito()
       if success then
-          write("Carta creata con successo. /n")
+          write("Carta creata con successo. \n")
       else
-          write("Errore carta non create. /n")
+          write("Errore carta non create. \n")
       end
   else
-      write("scelta non esistente. /n")
+      write("scelta non esistente. \n")
   end
   local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
   sleep(0.5)
