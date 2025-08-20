@@ -57,7 +57,38 @@ local function creaCartaDiCredito()
 end
 
 local function rimuoviCartaDiCredito()
-
+    local item = chest.getItemDetail(1)
+    
+    if not item then
+         write("Errore carta di credito assente .\n")
+        return false
+    end
+    if not item.name == "minecraft:paper" then
+          write("Errore carta di credito non è un pezzo di carta .\n")
+          return false
+    end
+    if not item.count == 1 then
+        write("Errore il numero di carte di credito è maggiore di 1.\n")
+        return false
+    end
+    
+    local cardKey = item.nbt
+    
+    if not cardKey then
+        write("Errore carta di credito non valida.\n")
+        return false
+    end
+    local loginResponse = sendRequest({cmd="esiste account", cardKey=cardKey})
+    
+    if loginResponse.success == true then
+        write("Carta già esistente.\n")
+        return false
+    end
+    write("Scrivere il pin della carta.\n")
+    local pin = read()
+    
+    local loginResponse = sendRequest({cmd="distruggi carta", cardKey=cardKey, pin = pin})
+    return loginResponse
 end
 
 local function aggiungiCreditiSociali()
@@ -69,30 +100,39 @@ local function rimuoviCreditiSociali()
 end
 
 while true do
-  write("Scrivere la propria scleta.\n")
-  write("1) Crea nuova carta di credito. \n")
-  write("2) Rimuovi carta di credito. \n")
-  write("3) Aggiungi crediti sociali ad un conto. \n")
-  write("4) Rimuovi crediti sociali ad un conto. \n")
-  write("5) Stampa nuovi crediti sociali validi. \n")
-  write("6) Rimuovi crediti sociali stampati. \n")
-  
-  local scelta = read()
-
-  if scelta == "1" then
-      local response = creaCartaDiCredito()
-      if response == false then
+    write("Scrivere la propria scelta.\n")
+    write("1) Crea nuova carta di credito. \n")
+    write("2) Rimuovi carta di credito. \n")
+    write("3) Aggiungi crediti sociali ad un conto. \n")
+    write("4) Rimuovi crediti sociali ad un conto. \n")
+    write("5) Stampa nuovi crediti sociali validi. \n")
+    write("6) Rimuovi crediti sociali stampati. \n")
+    
+    local scelta = read()
+    
+    if scelta == "1" then
+        local response = creaCartaDiCredito()
+        if response == false then
             write("Errore carta non creata. \n")
-      elseif response.success == false then
+        elseif response.success == false then
             write("Errore: " .. response.error .. "\n")
         elseif response.success == true then
-            write("Carta creata con successo")
-      end
-  else
-      write("scelta non esistente. \n")
-  end
-  
-  sleep(0.1)
+            write("Carta creata con successo \n")
+        end 
+    elseif scelta == "2" then
+        local response = rimuoviCartaDiCredito()
+         if response == false then
+            write("Errore carta non distruttua. \n")
+        elseif response.success == false then
+            write("Errore: " .. response.error .. "\n")
+        elseif response.success == true then
+            write("Carta distrutta con successo \n")
+        end 
+    else
+        write("scelta non esistente. \n")
+    end
+    
+    sleep(0.1)
 end
   
 
