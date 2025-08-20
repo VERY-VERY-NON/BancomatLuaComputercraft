@@ -162,23 +162,24 @@ local function getPin(accountEsiste)
     return pin
 end
 
-local function getPrintedMoney()
+local function getPrintedMoney(checkBarrel)
     while true do
 
-        local money = barrel.getItemDetail(1)
-
+        local money
         
-
-        if money and money.name == "computercraft:printed_page" and money.count == 1 and money.nbt then
-            local key = money.nbt
-            return key, nil
+        if checkBarrel then
+            money = barrel.getItemDetail(1)
         else
-            redstone.setAnalogOutput("bottom", 0)
-            sleep(0.3)
-            redstone.setAnalogOutput("bottom", 15)
+            money = chest.getItemDetail(1)
         end
 
-        sleep(0.1)
+   
+        if money and money.name == "computercraft:printed_page" and money.nbt then
+            local key = money.nbt
+            return key, nil
+        end
+
+        sleep(0.3)
     end
 end
 
@@ -186,8 +187,6 @@ end
 local function ascoltaMonitor()
     while true do
         local event, side, x, y = os.pullEvent("monitor_touch")
-        sleep(0.2)
-
         return nil, x
         
     end
@@ -344,7 +343,11 @@ else
             monitor.write("per andare indietro")
             
             redstone.setAnalogOutput("back", 0)
-            moneyKey, x = parallel.waitForAny(ascoltaMonitor, getPrintedMoney)
+            moneyKey, x = parallel.waitForAny(
+                ascoltaMonitor,
+                function() return getPrintedMoney(false) end
+            )
+
             redstone.setAnalogOutput("back", 15)
 
             if x then break end
@@ -412,7 +415,7 @@ else
                     local moneyKey
                     
                     repeat
-                        moneyKey = getPrintedMoney()
+                        moneyKey = getPrintedMoney(true)
                         sleep(0.5)
                     until moneyKey
 
