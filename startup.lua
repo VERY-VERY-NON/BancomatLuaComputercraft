@@ -7,7 +7,7 @@ while attempt < 10 do
         print("Errore: "..tostring(err))
     end
     attempt = attempt + 1
-    sleep(2) -- aspetta un po’ prima di riprovare
+    sleep(0.5) -- aspetta un po’ prima di riprovare
 end
 
 if peripheral.find("monitor") then
